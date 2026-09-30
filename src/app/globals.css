@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+
+@theme {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-border: var(--color-border);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-primary: var(--color-primary);
+  --color-ai: var(--color-ai);
+  --color-live: var(--color-live);
+  --color-danger: var(--color-danger);
+  --color-sky-top: var(--color-sky-top);
+
+  --font-headline: "Bricolage Grotesque Variable", sans-serif;
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+:root {
+  --color-bg: #F6F9FF;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EEF3FC;
+  --color-border: #DDE5F2;
+  --color-ink: #0B1324;
+  --color-ink-muted: #5A6A85;
+  --color-primary: #2F6BFF;
+  --color-ai: #7C5CFF;
+  --color-live: #16C79A;
+  --color-danger: #E5484D;
+  --color-sky-top: #DCE9FF;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #070B16;
+    --color-surface: #0E1424;
+    --color-surface-2: #151D31;
+    --color-border: #22304A;
+    --color-ink: #E8EEFA;
+    --color-ink-muted: #8C9AB5;
+    --color-primary: #5B8CFF;
+    --color-ai: #9B84FF;
+    --color-live: #2EE0AE;
+    --color-danger: #FF6B6F;
+    --color-sky-top: #0B1733;
+  }
+}
+
+[data-theme="dark"] {
+  --color-bg: #070B16;
+  --color-surface: #0E1424;
+  --color-surface-2: #151D31;
+  --color-border: #22304A;
+  --color-ink: #E8EEFA;
+  --color-ink-muted: #8C9AB5;
+  --color-primary: #5B8CFF;
+  --color-ai: #9B84FF;
+  --color-live: #2EE0AE;
+  --color-danger: #FF6B6F;
+  --color-sky-top: #0B1733;
+}
+
+[data-theme="light"] {
+  --color-bg: #F6F9FF;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EEF3FC;
+  --color-border: #DDE5F2;
+  --color-ink: #0B1324;
+  --color-ink-muted: #5A6A85;
+  --color-primary: #2F6BFF;
+  --color-ai: #7C5CFF;
+  --color-live: #16C79A;
+  --color-danger: #E5484D;
+  --color-sky-top: #DCE9FF;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+@keyframes cloudDrift1 {
+  0% {
+    transform: translate3d(-15vw, 0, 0);
+  }
+  50% {
+    transform: translate3d(45vw, -12px, 0);
+  }
+  100% {
+    transform: translate3d(105vw, 0, 0);
+  }
+}
+
+@keyframes cloudDrift2 {
+  0% {
+    transform: translate3d(-25vw, 15px, 0);
+  }
+  50% {
+    transform: translate3d(40vw, -18px, 0);
+  }
+  100% {
+    transform: translate3d(115vw, 15px, 0);
+  }
+}
+
+@keyframes cloudDrift3 {
+  0% {
+    transform: translate3d(-10vw, -10px, 0);
+  }
+  50% {
+    transform: translate3d(50vw, 12px, 0);
+  }
+  100% {
+    transform: translate3d(100vw, -10px, 0);
+  }
+}
+
+@keyframes cloudDrift4 {
+  0% {
+    transform: translate3d(-20vw, 8px, 0);
+  }
+  50% {
+    transform: translate3d(35vw, -15px, 0);
+  }
+  100% {
+    transform: translate3d(108vw, 8px, 0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+.animate-cloud-1 {
+  animation: cloudDrift1 60s linear infinite;
+}
+
+.animate-cloud-2 {
+  animation: cloudDrift2 90s linear infinite;
+  animation-delay: -30s;
+}
+
+.animate-cloud-3 {
+  animation: cloudDrift3 45s linear infinite;
+  animation-delay: -15s;
+}
+
+.animate-cloud-4 {
+  animation: cloudDrift4 75s linear infinite;
+  animation-delay: -45s;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 6s ease-in-out infinite;
+}
+
+.animation-paused {
+  animation-play-state: paused !important;
+}
+
+@keyframes sublineSwap {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-sublineSwap {
+  animation: sublineSwap 200ms ease-out 50ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cloud-1,
+  .animate-cloud-2,
+  .animate-cloud-3,
+  .animate-cloud-4,
+  .animate-pulse-glow,
+  .animate-sublineSwap {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+
+
