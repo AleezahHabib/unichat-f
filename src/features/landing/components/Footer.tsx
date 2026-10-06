@@ -31,6 +31,15 @@ export function Footer() {
           <Link href="/#faq" className="hover:text-ink transition-colors">
             FAQ
           </Link>
+          <Link href="/privacy" className="hover:text-ink transition-colors">
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="hover:text-ink transition-colors">
+            Terms of Service
+          </Link>
+          <a href="mailto:unichatapp.support@gmail.com" className="hover:text-ink transition-colors">
+            Support
+          </a>
           <Link href="/login" className="hover:text-ink transition-colors">
             Log in
           </Link>
