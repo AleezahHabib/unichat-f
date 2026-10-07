@@ -1,11 +1,11 @@
 import * as React from "react";
 import Link from "next/link";
-import { UniChatLogo } from "@/components/ui/UniChatLogo";
+import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata = {
-  title: "Terms of Service | UniChat",
-  description: "Terms of service and acceptable usage policies for the UniChat application.",
+  title: "Terms of Service | FistaChat",
+  description: "Terms of service and acceptable usage policies for the FistaChat application.",
 };
 
 export default function TermsPage() {
@@ -15,8 +15,8 @@ export default function TermsPage() {
       <header className="border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5 font-headline font-bold text-lg text-ink hover:opacity-90 transition-opacity">
-            <UniChatLogo className="w-7 h-7" />
-            <span>UniChat</span>
+            <FistaChatLogo className="w-7 h-7" />
+            <span>FistaChat</span>
           </Link>
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -50,7 +50,7 @@ export default function TermsPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">1. Acceptance of Terms</h2>
               <p>
-                By accessing or using UniChat (&ldquo;the Service&rdquo;), you agree to be bound by these Terms of Service. If you are entering into this agreement on behalf of a company or organization, you represent that you have the authority to bind such entity.
+                By accessing or using FistaChat (&ldquo;the Service&rdquo;), you agree to be bound by these Terms of Service. If you are entering into this agreement on behalf of a company or organization, you represent that you have the authority to bind such entity.
               </p>
             </section>
 
@@ -58,14 +58,14 @@ export default function TermsPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">2. Service Description</h2>
               <p>
-                UniChat is a unified workspace collaboration platform that enables real-time messaging, bidirectional cross-platform synchronization with Slack and Discord, and AI-assisted workspace intelligence powered by Google Gemini.
+                FistaChat is a unified workspace collaboration platform that enables real-time messaging, bidirectional cross-platform synchronization with Slack and Discord, and AI-assisted workspace intelligence powered by Google Gemini.
               </p>
             </section>
 
             {/* Section 3 */}
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">3. Acceptable Use Policy</h2>
-              <p>You agree not to use UniChat to:</p>
+              <p>You agree not to use FistaChat to:</p>
               <ul className="list-disc list-inside space-y-2 text-ink-muted">
                 <li>Transmit unlawful, abusive, defamatory, or harmful content.</li>
                 <li>Attempt to bypass rate limits, authentication barriers, or security controls.</li>
@@ -78,7 +78,7 @@ export default function TermsPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">4. Third-Party Integrations</h2>
               <p>
-                UniChat connects to external services including Slack and Discord via their respective APIs and Socket Mode protocols. Your use of those platforms is also governed by their respective terms of service. UniChat is not affiliated with or endorsed by Slack Technologies, LLC or Discord Inc.
+                FistaChat connects to external services including Slack and Discord via their respective APIs and Socket Mode protocols. Your use of those platforms is also governed by their respective terms of service. FistaChat is not affiliated with or endorsed by Slack Technologies, LLC or Discord Inc.
               </p>
             </section>
 
@@ -86,7 +86,7 @@ export default function TermsPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">5. Disclaimer of Warranties &amp; Limitation of Liability</h2>
               <p>
-                The Service is provided on an &ldquo;AS IS&rdquo; and &ldquo;AS AVAILABLE&rdquo; basis. UniChat does not guarantee uninterrupted or error-free operation. In no event shall UniChat or its developers be liable for indirect, incidental, special, consequential, or punitive damages resulting from your use of the service.
+                The Service is provided on an &ldquo;AS IS&rdquo; and &ldquo;AS AVAILABLE&rdquo; basis. FistaChat does not guarantee uninterrupted or error-free operation. In no event shall FistaChat or its developers be liable for indirect, incidental, special, consequential, or punitive damages resulting from your use of the service.
               </p>
             </section>
 
@@ -111,7 +111,7 @@ export default function TermsPage() {
 
       {/* Footer */}
       <footer className="border-t border-border bg-surface py-6 px-4 text-center text-xs text-ink-muted">
-        &copy; {new Date().getFullYear()} UniChat. All rights reserved. Built with Next.js, FastAPI, PostgreSQL, and Gemini.
+        &copy; {new Date().getFullYear()} FistaChat. All rights reserved. Built with Next.js, FastAPI, PostgreSQL, and Gemini.
       </footer>
     </div>
   );

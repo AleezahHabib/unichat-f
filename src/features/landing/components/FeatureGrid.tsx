@@ -104,7 +104,7 @@ export function FeatureGrid() {
               Search by meaning
             </h3>
             <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-              Find what you&apos;re looking for by concept and context across UniChat, Slack, and Discord—even without exact keyword matches.
+              Find what you&apos;re looking for by concept and context across FistaChat, Slack, and Discord—even without exact keyword matches.
             </p>
           </div>
         </div>

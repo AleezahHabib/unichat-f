@@ -145,13 +145,13 @@ function ConnectMockup({
 }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full w-full py-2">
-      {/* UniChat Window Left */}
+      {/* FistaChat Window Left */}
       <div className="rounded-[14px] bg-surface border border-border p-4 flex flex-col justify-between shadow-sm relative overflow-hidden">
         <div>
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-              <span className="font-semibold text-xs text-ink">UniChat Workspace</span>
+              <span className="font-semibold text-xs text-ink">FistaChat Workspace</span>
             </div>
             <span className="px-2 py-0.5 rounded-full bg-live/10 text-live text-[10px] font-bold">
               Hub Active
@@ -207,7 +207,7 @@ function ConnectMockup({
           </div>
           <div className="p-2.5 rounded-[8px] bg-surface-2 text-xs text-ink">
             <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-ink">Alice (via UniChat)</span>
+              <span className="font-semibold text-ink">Alice (via FistaChat)</span>
               <span className="text-[10px] text-ink-muted">Just now</span>
             </div>
             Deploying v2.5 to production now.
@@ -227,7 +227,7 @@ function ConnectMockup({
           </div>
           <div className="p-2.5 rounded-[8px] bg-surface-2 text-xs text-ink">
             <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-ink">Alice (via UniChat)</span>
+              <span className="font-semibold text-ink">Alice (via FistaChat)</span>
               <span className="text-[10px] text-ink-muted">Just now</span>
             </div>
             Deploying v2.5 to production now.
@@ -256,7 +256,7 @@ function AskMockup() {
         </div>
         <div className="space-y-3 w-full">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-sm text-ai">UniChat Assistant</span>
+            <span className="font-semibold text-sm text-ai">FistaChat Assistant</span>
             <span className="px-2 py-0.5 rounded-full bg-ai/10 text-ai text-[10px] font-bold border border-ai/20">
               Gemini 2.5 Flash
             </span>

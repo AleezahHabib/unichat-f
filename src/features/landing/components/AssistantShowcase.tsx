@@ -22,7 +22,7 @@ export function AssistantShowcase() {
           </h2>
 
           <p className="text-base text-ink-muted leading-relaxed">
-            The assistant has read everything the team said across UniChat, Slack, and Discord, and every answer shows the exact messages it came from with direct clickable links.
+            The assistant has read everything the team said across FistaChat, Slack, and Discord, and every answer shows the exact messages it came from with direct clickable links.
           </p>
 
           <div className="pt-2 flex items-center gap-2 text-xs font-medium text-ink-muted border-t border-ai/20">
@@ -36,7 +36,7 @@ export function AssistantShowcase() {
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-ai" />
-              <span className="font-bold text-sm text-ink">UniChat Assistant</span>
+              <span className="font-bold text-sm text-ink">FistaChat Assistant</span>
             </div>
             <span className="text-xs font-mono text-ai">Google Gemini 2.5 Flash</span>
           </div>

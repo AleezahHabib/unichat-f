@@ -12,9 +12,9 @@ interface FaqItem {
 const FAQS: FaqItem[] = [
   {
     id: "faq-1",
-    question: "Is UniChat free?",
+    question: "Is FistaChat free?",
     answer:
-      "Yes! UniChat is designed to run entirely on generous free tiers: Google AI Studio Gemini API key, Neon PostgreSQL (pgvector), Upstash Redis, Railway, and Vercel.",
+      "Yes! FistaChat is designed to run entirely on generous free tiers: Google AI Studio Gemini API key, Neon PostgreSQL (pgvector), Upstash Redis, Railway, and Vercel.",
   },
   {
     id: "faq-2",
@@ -32,13 +32,13 @@ const FAQS: FaqItem[] = [
     id: "faq-4",
     question: "Which AI model does it use?",
     answer:
-      "UniChat uses Google Gemini 2.5 Flash for chat completions, channel summaries, and draft replies, paired with `gemini-embedding-001` (768 dimensions) for vector search.",
+      "FistaChat uses Google Gemini 2.5 Flash for chat completions, channel summaries, and draft replies, paired with `gemini-embedding-001` (768 dimensions) for vector search.",
   },
   {
     id: "faq-5",
     question: "Do I need a public server for Slack?",
     answer:
-      "No. UniChat uses Slack Socket Mode, establishing an outbound WebSocket connection directly from the backend to Slack—no public ingress URL, static IP, or ngrok tunnel required.",
+      "No. FistaChat uses Slack Socket Mode, establishing an outbound WebSocket connection directly from the backend to Slack—no public ingress URL, static IP, or ngrok tunnel required.",
   },
   {
     id: "faq-6",
@@ -62,7 +62,7 @@ export function Faq() {
           Frequently asked questions
         </h2>
         <p className="text-base sm:text-lg text-ink-muted">
-          Everything you need to know about UniChat architecture, privacy, and integrations.
+          Everything you need to know about FistaChat architecture, privacy, and integrations.
         </p>
       </div>
 

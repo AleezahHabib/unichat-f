@@ -5,14 +5,14 @@ const STEPS = [
   {
     step: "01",
     title: "Create a workspace",
-    description: "Launch your UniChat workspace in under 60 seconds. Invite team members with simple, secure invite links.",
+    description: "Launch your FistaChat workspace in under 60 seconds. Invite team members with simple, secure invite links.",
     bestFor: "Best for distributed engineering teams needing a single central channel hub.",
     icon: UserPlus,
   },
   {
     step: "02",
     title: "Link a channel",
-    description: "Connect any UniChat channel to Slack or Discord. Messages flow both ways automatically with zero complex setup.",
+    description: "Connect any FistaChat channel to Slack or Discord. Messages flow both ways automatically with zero complex setup.",
     bestFor: "Best for bridging open-source Discord communities with internal Slack channels.",
     icon: Link2,
   },
@@ -30,7 +30,7 @@ export function HowItWorks() {
     <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-headline text-ink">
-          How UniChat works
+          How FistaChat works
         </h2>
         <p className="text-base sm:text-lg text-ink-muted">
           Three simple steps to bridge your communication stack and unlock grounded AI intelligence.

@@ -192,7 +192,7 @@ export default function WorkspaceLayout({
             >
               <Menu className="w-4 h-4" />
               <span className="text-xs font-semibold font-[var(--font-headline)] truncate max-w-[150px]">
-                {workspace?.name || "UniChat"}
+                {workspace?.name || "FistaChat"}
               </span>
             </button>
             <div className="flex items-center gap-1">

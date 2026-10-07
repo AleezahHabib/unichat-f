@@ -13,7 +13,7 @@ async function getAuthToken() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: 'alice_e2e@example.com', password: 'Password123!' }),
   });
-  if (!res.ok) throw new Error('Failed to authenticate alice_e2e: ' + res.statusText);
+  if (!res.ok) throw new Error('Failed to authenticate: ' + res.statusText);
   const data = await res.json();
   return data.access_token;
 }
@@ -29,85 +29,84 @@ async function main() {
   const token = await getAuthToken();
   const workspaces = await getWorkspaces(token);
   const targetWs = workspaces[0];
-  console.log('Using Workspace:', targetWs.name, targetWs.id);
 
   const browser = await chromium.launch({ headless: true });
 
-  // 1. Desktop 1440px Light Mode
-  console.log('1. Capturing Desktop 1440px Light Mode...');
-  const desktopContext = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
-    colorScheme: 'light',
-  });
-  await desktopContext.addInitScript((tok) => {
-    localStorage.setItem('unichat_token', tok);
-  }, token);
-
-  const desktopPage = await desktopContext.newPage();
-  await desktopPage.goto(`http://localhost:3000/workspace/${targetWs.id}`);
-  await desktopPage.waitForSelector('aside', { timeout: 15000 });
-  await desktopPage.waitForTimeout(1500);
-
-  // Open Workspace Switcher dropdown
-  const switcherBtn = await desktopPage.$('aside button[aria-haspopup="true"]');
-  if (switcherBtn) {
-    await switcherBtn.click();
-    await desktopPage.waitForTimeout(600);
-  }
-
-  const desktopLightPath = path.join(screenshotDir, 'desktop_1440_light.png');
-  await desktopPage.screenshot({ path: desktopLightPath, fullPage: false });
-  console.log('Saved:', desktopLightPath);
-
-  // 2. Desktop 1440px Dark Mode
-  console.log('2. Capturing Desktop 1440px Dark Mode...');
-  await desktopPage.evaluate(() => {
+  // 1. Landing Page Desktop (Light & Dark)
+  console.log('1. Capturing Landing Page...');
+  const landingCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const landingPage = await landingCtx.newPage();
+  await landingPage.goto('http://localhost:3000');
+  await landingPage.waitForSelector('nav');
+  await landingPage.waitForTimeout(1000);
+  
+  await landingPage.screenshot({ path: path.join(screenshotDir, 'landing_1440_light.png') });
+  
+  await landingPage.evaluate(() => {
     document.documentElement.classList.add('dark');
     document.documentElement.setAttribute('data-theme', 'dark');
   });
-  await desktopPage.waitForTimeout(600);
-  const desktopDarkPath = path.join(screenshotDir, 'desktop_1440_dark.png');
-  await desktopPage.screenshot({ path: desktopDarkPath, fullPage: false });
-  console.log('Saved:', desktopDarkPath);
-  await desktopContext.close();
+  await landingPage.waitForTimeout(500);
+  await landingPage.screenshot({ path: path.join(screenshotDir, 'landing_1440_dark.png') });
+  await landingCtx.close();
 
-  // 3. Mobile 375px Light Mode
-  console.log('3. Capturing Mobile 375px Light Mode...');
-  const mobileContext = await browser.newContext({
-    viewport: { width: 375, height: 812 },
-    colorScheme: 'light',
-  });
-  await mobileContext.addInitScript((tok) => {
-    localStorage.setItem('unichat_token', tok);
+  // 2. Workspace Desktop with Switcher open (Light & Dark)
+  console.log('2. Capturing Workspace Desktop...');
+  const appCtx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await appCtx.addInitScript((tok) => {
+    window.localStorage.setItem('unichat_token', tok);
   }, token);
 
-  const mobilePage = await mobileContext.newPage();
+  const appPage = await appCtx.newPage();
+  await appPage.goto(`http://localhost:3000/workspace/${targetWs.id}`);
+  await appPage.waitForSelector('aside', { timeout: 15000 });
+  await appPage.waitForTimeout(1000);
+
+  // Open switcher
+  const switcher = await appPage.$('aside button[aria-haspopup="true"]');
+  if (switcher) {
+    await switcher.click();
+    await appPage.waitForTimeout(500);
+  }
+
+  await appPage.screenshot({ path: path.join(screenshotDir, 'desktop_1440_light.png') });
+
+  // Dark mode
+  await appPage.evaluate(() => {
+    document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
+  });
+  await appPage.waitForTimeout(500);
+  await appPage.screenshot({ path: path.join(screenshotDir, 'desktop_1440_dark.png') });
+  await appCtx.close();
+
+  // 3. Mobile 375px (Light & Dark)
+  console.log('3. Capturing Mobile Views...');
+  const mobileCtx = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  await mobileCtx.addInitScript((tok) => {
+    window.localStorage.setItem('unichat_token', tok);
+  }, token);
+
+  const mobilePage = await mobileCtx.newPage();
   await mobilePage.goto(`http://localhost:3000/workspace/${targetWs.id}`);
   await mobilePage.waitForSelector('button[aria-label="Open navigation menu"]', { timeout: 15000 });
   await mobilePage.waitForTimeout(1000);
 
-  // Open mobile slide-over sidebar
   const menuBtn = await mobilePage.$('button[aria-label="Open navigation menu"]');
   if (menuBtn) {
     await menuBtn.click();
-    await mobilePage.waitForTimeout(600);
+    await mobilePage.waitForTimeout(500);
   }
 
-  const mobileLightPath = path.join(screenshotDir, 'mobile_375_light.png');
-  await mobilePage.screenshot({ path: mobileLightPath, fullPage: false });
-  console.log('Saved:', mobileLightPath);
+  await mobilePage.screenshot({ path: path.join(screenshotDir, 'mobile_375_light.png') });
 
-  // 4. Mobile 375px Dark Mode
-  console.log('4. Capturing Mobile 375px Dark Mode...');
   await mobilePage.evaluate(() => {
     document.documentElement.classList.add('dark');
     document.documentElement.setAttribute('data-theme', 'dark');
   });
-  await mobilePage.waitForTimeout(600);
-  const mobileDarkPath = path.join(screenshotDir, 'mobile_375_dark.png');
-  await mobilePage.screenshot({ path: mobileDarkPath, fullPage: false });
-  console.log('Saved:', mobileDarkPath);
-  await mobileContext.close();
+  await mobilePage.waitForTimeout(500);
+  await mobilePage.screenshot({ path: path.join(screenshotDir, 'mobile_375_dark.png') });
+  await mobileCtx.close();
 
   await browser.close();
   console.log('ALL SCREENSHOTS CAPTURED SUCCESSFULLY!');

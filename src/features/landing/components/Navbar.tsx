@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { UniChatLogo } from "@/components/ui/UniChatLogo";
+import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 
 export function Navbar() {
   const [scrolled, setScrolled] = React.useState(false);
@@ -33,9 +33,9 @@ export function Navbar() {
           href="/"
           className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-primary rounded-[10px]"
         >
-          <UniChatLogo className="w-8 h-8" />
+          <FistaChatLogo className="w-8 h-8" />
           <span className="font-headline font-bold text-xl tracking-tight text-ink">
-            UniChat
+            FistaChat
           </span>
         </Link>
 

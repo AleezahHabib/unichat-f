@@ -1,6 +1,6 @@
-# UniChat Frontend
+# FistaChat Frontend
 
-Modern Next.js 15 (App Router) web client for **UniChat** — unified team chat with bidirectional Slack & Discord synchronization and grounded Gemini AI intelligence.
+Modern Next.js 15 (App Router) web client for **FistaChat** — unified team chat with bidirectional Slack & Discord synchronization and grounded Gemini AI intelligence.
 
 ---
 

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../useAuth";
-import { UniChatLogo } from "@/components/ui/UniChatLogo";
+import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 import { Eye, EyeOff, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 
 export function LoginForm({ redirectTo }: { redirectTo?: string }) {
@@ -51,9 +51,9 @@ export function LoginForm({ redirectTo }: { redirectTo?: string }) {
       {/* Brand Header */}
       <div className="text-center mb-8">
         <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] rounded-lg p-1">
-          <UniChatLogo className="w-10 h-10 transition-transform group-hover:scale-105" />
+          <FistaChatLogo className="w-10 h-10 transition-transform group-hover:scale-105" />
           <span className="text-2xl font-black tracking-tight text-[var(--color-ink)] font-[var(--font-headline)]">
-            UniChat
+            FistaChat
           </span>
         </Link>
         <h1 className="text-2xl font-bold text-[var(--color-ink)] tracking-tight font-[var(--font-headline)]">

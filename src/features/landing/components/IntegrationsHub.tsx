@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UniChatLogo } from "@/components/ui/UniChatLogo";
+import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 import { FolderPlus } from "lucide-react";
 
 export function IntegrationsHub() {
@@ -26,10 +26,10 @@ export function IntegrationsHub() {
             <span className="text-xs font-medium text-ink-muted">Two-way live sync</span>
           </div>
 
-          {/* Center Hub: UniChat Core */}
+          {/* Center Hub: FistaChat Core */}
           <div className="p-6 rounded-[20px] bg-primary/10 border-2 border-primary flex flex-col items-center space-y-3 shadow-md relative">
-            <UniChatLogo className="w-14 h-14" />
-            <span className="font-headline font-extrabold text-lg text-ink">UniChat Core</span>
+            <FistaChatLogo className="w-14 h-14" />
+            <span className="font-headline font-extrabold text-lg text-ink">FistaChat Core</span>
             <span className="text-xs px-2.5 py-1 rounded-full bg-surface text-primary border border-primary/30 font-semibold">
               Unified stream
             </span>

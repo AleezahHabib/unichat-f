@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { UniChatLogo } from "@/components/ui/UniChatLogo";
+import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 
 export function Footer() {
   return (
@@ -9,8 +9,8 @@ export function Footer() {
         {/* Logo & Tagline */}
         <div className="space-y-2">
           <Link href="/" className="inline-flex items-center gap-3">
-            <UniChatLogo className="w-7 h-7" />
-            <span className="font-headline font-bold text-lg text-ink">UniChat</span>
+            <FistaChatLogo className="w-7 h-7" />
+            <span className="font-headline font-bold text-lg text-ink">FistaChat</span>
           </Link>
           <p className="text-xs text-ink-muted">
             Unified team chat with Slack &amp; Discord sync and Gemini AI intelligence.

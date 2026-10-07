@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "UniChat | Chat. Connect. Ask.",
+  title: "FistaChat | Chat. Connect. Ask.",
   description: "Unified team chat connected to Slack and Discord with Gemini AI assistance.",
 };
 

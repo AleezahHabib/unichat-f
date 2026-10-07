@@ -1,11 +1,11 @@
 import * as React from "react";
 import Link from "next/link";
-import { UniChatLogo } from "@/components/ui/UniChatLogo";
+import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export const metadata = {
-  title: "Privacy Policy | UniChat",
-  description: "Learn how UniChat handles and protects your workspace communications, tokens, and AI data.",
+  title: "Privacy Policy | FistaChat",
+  description: "Learn how FistaChat handles and protects your workspace communications, tokens, and AI data.",
 };
 
 export default function PrivacyPage() {
@@ -15,8 +15,8 @@ export default function PrivacyPage() {
       <header className="border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5 font-headline font-bold text-lg text-ink hover:opacity-90 transition-opacity">
-            <UniChatLogo className="w-7 h-7" />
-            <span>UniChat</span>
+            <FistaChatLogo className="w-7 h-7" />
+            <span>FistaChat</span>
           </Link>
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">1. Overview &amp; Commitment</h2>
               <p>
-                UniChat is dedicated to protecting the privacy and security of your team communications. This Privacy Policy explains how information is collected, stored, encrypted, processed, and safeguarded when using our unified chat service, connected platform integrations (Slack, Discord), and AI assistance tools.
+                FistaChat is dedicated to protecting the privacy and security of your team communications. This Privacy Policy explains how information is collected, stored, encrypted, processed, and safeguarded when using our unified chat service, connected platform integrations (Slack, Discord), and AI assistance tools.
               </p>
             </section>
 
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
                   <strong className="text-ink">Workspace &amp; Channel Data:</strong> Workspace names, channel names, membership rosters, and team settings stored in Neon PostgreSQL.
                 </li>
                 <li>
-                  <strong className="text-ink">Messages:</strong> Message text, timestamps, author identifiers, parent-child thread references, and origin metadata (UniChat, Slack, or Discord).
+                  <strong className="text-ink">Messages:</strong> Message text, timestamps, author identifiers, parent-child thread references, and origin metadata (FistaChat, Slack, or Discord).
                 </li>
                 <li>
                   <strong className="text-ink">Integration Tokens:</strong> Slack Bot tokens, App-level tokens, Discord bot tokens, and incoming webhook URLs. These are <strong className="text-ink">strictly encrypted at rest</strong> using AES-256 / Fernet encryption.
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">3. AI Processing &amp; Gemini Integration</h2>
               <p>
-                UniChat utilizes Google Gemini API models to provide on-demand semantic search, channel summarization, and draft reply generation.
+                FistaChat utilizes Google Gemini API models to provide on-demand semantic search, channel summarization, and draft reply generation.
               </p>
               <ul className="list-disc list-inside space-y-2 text-ink-muted">
                 <li>
@@ -96,14 +96,14 @@ export default function PrivacyPage() {
             <section className="p-6 rounded-2xl bg-surface border border-border space-y-3">
               <h2 className="text-lg font-bold font-headline text-ink">4. Third-Party Integrations (Slack &amp; Discord)</h2>
               <p>
-                When you connect a Slack workspace or Discord server to UniChat:
+                When you connect a Slack workspace or Discord server to FistaChat:
               </p>
               <ul className="list-disc list-inside space-y-2 text-ink-muted">
                 <li>
                   Tokens granted via Slack OAuth or manual bot setup are used strictly to relay messages between linked channels and read authorized channel metadata.
                 </li>
                 <li>
-                  We do not read or process private DMs or channels that have not been explicitly linked to a UniChat channel.
+                  We do not read or process private DMs or channels that have not been explicitly linked to a FistaChat channel.
                 </li>
               </ul>
             </section>
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
 
       {/* Footer */}
       <footer className="border-t border-border bg-surface py-6 px-4 text-center text-xs text-ink-muted">
-        &copy; {new Date().getFullYear()} UniChat. All rights reserved. Built with Next.js, FastAPI, PostgreSQL, and Gemini.
+        &copy; {new Date().getFullYear()} FistaChat. All rights reserved. Built with Next.js, FastAPI, PostgreSQL, and Gemini.
       </footer>
     </div>
   );
