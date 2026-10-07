@@ -4,23 +4,6 @@
  */
 
 export interface paths {
-    "/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Health check */
-        get: operations["getHealth"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/auth/signup": {
         parameters: {
             query?: never;
@@ -30,8 +13,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Register a new user */
-        post: operations["registerUser"];
+        /** Sign up a new user */
+        post: operations["signup_auth_signup_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -47,8 +30,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Log in with email and password */
-        post: operations["loginUser"];
+        /** Log in user */
+        post: operations["login_auth_login_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -62,8 +45,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get current authenticated user */
-        get: operations["getCurrentUser"];
+        /** Get current user profile */
+        get: operations["get_me_auth_me_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -80,10 +63,10 @@ export interface paths {
             cookie?: never;
         };
         /** List workspaces for current user */
-        get: operations["listWorkspaces"];
+        get: operations["list_workspaces_workspaces_get"];
         put?: never;
         /** Create a new workspace */
-        post: operations["createWorkspace"];
+        post: operations["create_workspace_workspaces_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -101,7 +84,41 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete a workspace (Owner only) */
-        delete: operations["deleteWorkspace"];
+        delete: operations["delete_workspace_workspaces__workspace_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspace_id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Leave a workspace (removes from workspace and all channels; owner cannot leave) */
+        post: operations["leave_workspace_workspaces__workspace_id__leave_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/workspaces/{workspace_id}/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a member from a workspace (Owner only) */
+        delete: operations["remove_workspace_member_workspaces__workspace_id__members__user_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -114,8 +131,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List members in workspace */
-        get: operations["listWorkspaceMembers"];
+        /** List workspace members */
+        get: operations["list_workspace_members_workspaces__workspace_id__members_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -133,8 +150,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create workspace invite link */
-        post: operations["createInvite"];
+        /** Create a workspace invite link */
+        post: operations["create_invite_workspaces__workspace_id__invites_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -148,8 +165,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Preview invite details */
-        get: operations["getInvitePreview"];
+        /** Preview workspace invite link details */
+        get: operations["get_invite_preview_invites__token__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -168,7 +185,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Accept workspace invite */
-        post: operations["acceptInvite"];
+        post: operations["accept_invite_invites__token__accept_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -182,11 +199,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List channels in a workspace */
-        get: operations["listChannels"];
+        /** List channels in workspace */
+        get: operations["list_workspace_channels_workspaces__workspace_id__channels_get"];
         put?: never;
-        /** Create a new channel */
-        post: operations["createChannel"];
+        /** Create a channel in workspace */
+        post: operations["create_channel_workspaces__workspace_id__channels_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -203,7 +220,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Join a channel */
-        post: operations["joinChannel"];
+        post: operations["join_channel_channels__channel_id__join_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -220,7 +237,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Leave a channel */
-        post: operations["leaveChannel"];
+        post: operations["leave_channel_channels__channel_id__leave_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -235,7 +252,7 @@ export interface paths {
             cookie?: never;
         };
         /** List channel members */
-        get: operations["listChannelMembers"];
+        get: operations["list_channel_members_channels__channel_id__members_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -251,11 +268,45 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get messages in a channel with cursor pagination */
-        get: operations["listMessages"];
+        /** List messages in a channel (cursor pagination) */
+        get: operations["get_channel_messages_channels__channel_id__messages_get"];
         put?: never;
         /** Post a message to a channel */
-        post: operations["createMessage"];
+        post: operations["create_message_channels__channel_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{channel_id}/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear channel history for the current user only */
+        post: operations["clear_channel_channels__channel_id__clear_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/messages/{message_id}/thread": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get thread replies for a message */
+        get: operations["get_thread_messages__message_id__thread_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -272,23 +323,40 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
-        /** Soft delete message */
-        delete: operations["deleteMessage"];
+        /** Soft delete a message */
+        delete: operations["delete_message_messages__message_id__delete"];
         options?: never;
         head?: never;
-        /** Edit message */
-        patch: operations["updateMessage"];
+        /** Edit a message */
+        patch: operations["update_message_messages__message_id__patch"];
         trace?: never;
     };
-    "/messages/{message_id}/thread": {
+    "/integrations/slack/oauth/start": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get thread replies for a message */
-        get: operations["getThread"];
+        /** Start Slack OAuth authorization flow */
+        get: operations["start_slack_oauth_integrations_slack_oauth_start_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/slack/oauth/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Handle Slack OAuth callback and redirect to frontend */
+        get: operations["slack_oauth_callback_integrations_slack_oauth_callback_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -305,7 +373,7 @@ export interface paths {
             cookie?: never;
         };
         /** List connected integrations for workspace */
-        get: operations["listIntegrations"];
+        get: operations["list_integrations_integrations_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -314,15 +382,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/integrations/slack/oauth/start": {
+    "/workspaces/{workspace_id}/channel-links": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Start Slack OAuth authorization flow */
-        get: operations["startSlackOAuth"];
+        /** List channel links for a workspace */
+        get: operations["list_workspace_channel_links_workspaces__workspace_id__channel_links_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -331,15 +399,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/integrations/slack/oauth/callback": {
+    "/channels/{channel_id}/links": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Slack OAuth callback handler */
-        get: operations["slackOAuthCallback"];
+        /** List links for a specific channel */
+        get: operations["get_channel_links_channels__channel_id__links_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -357,8 +425,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Connect Slack workspace integration manually */
-        post: operations["connectSlack"];
+        /** Connect Slack workspace integration */
+        post: operations["connect_slack_integrations_slack_connect_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -375,7 +443,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Connect Discord bot integration */
-        post: operations["connectDiscord"];
+        post: operations["connect_discord_integrations_discord_connect_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -393,7 +461,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Disconnect platform integration */
-        delete: operations["deleteIntegration"];
+        delete: operations["delete_integration_integrations__platform_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -406,8 +474,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List external channels available on connected platform */
-        get: operations["listExternalChannels"];
+        /** List channels available on connected platform */
+        get: operations["list_external_channels_integrations__platform_id__external_channels_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -426,9 +494,111 @@ export interface paths {
         get?: never;
         put?: never;
         /** Link a UniChat channel to an external platform channel */
-        post: operations["linkChannel"];
+        post: operations["link_channel_channels__channel_id__link_post"];
         /** Unlink a channel from a platform */
-        delete: operations["unlinkChannel"];
+        delete: operations["unlink_channel_channels__channel_id__link_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assistant/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Chat with Gemini AI assistant */
+        post: operations["chat_with_assistant_assistant_chat_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assistant/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get assistant chat session history */
+        get: operations["get_assistant_history_assistant_history_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assistant/summarize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Summarize recent channel messages */
+        post: operations["summarize_channel_assistant_summarize_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/assistant/draft-reply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Draft an AI response to a message */
+        post: operations["draft_reply_assistant_draft_reply_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Semantic vector search across workspace messages */
+        get: operations["search_messages_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health Check */
+        get: operations["health_check_health_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -438,225 +608,558 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        HealthResponse: {
-            /** @example ok */
-            status: string;
-            /** @example true */
-            database: boolean;
-            /** @example true */
-            redis: boolean;
-            /** @example enabled */
-            ai: string;
-            /** @example off */
-            background: string;
+        /** AcceptInviteResponse */
+        AcceptInviteResponse: {
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
         };
-        ErrorDetail: {
-            detail: string;
-            code: string;
+        /** AssistantChatRequest */
+        AssistantChatRequest: {
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Session Id */
+            session_id: string;
+            /** Message */
+            message: string;
         };
-        UserResponse: {
-            /** Format: uuid */
+        /** AssistantChatResponse */
+        AssistantChatResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
             id: string;
-            name: string;
-            /** Format: email */
-            email: string;
-            avatar_color: string;
-            /** Format: date-time */
+            /** Session Id */
+            session_id: string;
+            /** Role */
+            role: string;
+            /** Content */
+            content: string;
+            /**
+             * Citations
+             * @default []
+             */
+            citations: components["schemas"]["Citation"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
         };
-        RegisterRequest: {
-            name: string;
-            /** Format: email */
-            email: string;
-            password: string;
-        };
-        LoginRequest: {
-            /** Format: email */
-            email: string;
-            password: string;
-        };
+        /** AuthResponse */
         AuthResponse: {
+            /** Access Token */
             access_token: string;
-            /** @example bearer */
+            /**
+             * Token Type
+             * @default bearer
+             */
             token_type: string;
             user: components["schemas"]["UserResponse"];
         };
-        WorkspaceResponse: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** Format: uuid */
-            owner_id: string;
-            /** Format: date-time */
-            created_at: string;
-            /** @example 3 */
-            member_count?: number;
-        };
-        CreateWorkspaceRequest: {
-            name: string;
-        };
-        WorkspaceMemberResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            user_id: string;
-            name: string;
-            email: string;
-            avatar_color: string;
-            role: string;
-            /** Format: date-time */
-            joined_at: string;
-            online: boolean;
-        };
-        CreateInviteResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            workspace_id: string;
-            token: string;
-            /** Format: date-time */
-            expires_at: string;
-            /** Format: date-time */
-            created_at: string;
-        };
-        InvitePreviewResponse: {
-            workspace_name: string;
-            inviter_name: string;
-            /** Format: date-time */
-            expires_at: string;
-            is_expired: boolean;
-        };
-        AcceptInviteResponse: {
-            /** Format: uuid */
-            workspace_id: string;
-        };
-        ChannelResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            workspace_id: string;
-            name: string;
-            description?: string | null;
-            /** Format: uuid */
-            created_by?: string | null;
-            /** Format: date-time */
-            created_at: string;
-        };
-        CreateChannelRequest: {
-            name: string;
-            description?: string | null;
-        };
-        ChannelMemberResponse: {
-            /** Format: uuid */
-            user_id: string;
-            name: string;
-            email: string;
-            avatar_color: string;
-            /** Format: date-time */
-            joined_at: string;
-        };
-        CreateMessageRequest: {
-            body: string;
-            /** Format: uuid */
-            parent_id?: string | null;
-        };
-        UpdateMessageRequest: {
-            body: string;
-        };
-        MessageAuthor: {
-            /** Format: uuid */
-            id?: string | null;
-            name: string;
-            avatar_color?: string | null;
-            is_external: boolean;
-        };
-        MessageResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            channel_id: string;
-            author: components["schemas"]["MessageAuthor"];
-            body: string;
-            source: string;
-            /** Format: uuid */
-            parent_id?: string | null;
-            external_id?: string | null;
-            external_channel_id?: string | null;
-            /** Format: date-time */
-            created_at: string;
-            /** Format: date-time */
-            edited_at?: string | null;
-            is_deleted: boolean;
-            reply_count: number;
-            /** Format: date-time */
-            last_reply_at?: string | null;
-        };
-        MessagesPageResponse: {
-            items: components["schemas"]["MessageResponse"][];
-            next_cursor?: string | null;
-        };
-        ThreadResponse: {
-            parent: components["schemas"]["MessageResponse"];
-            replies: components["schemas"]["MessageResponse"][];
-        };
-        ConnectedPlatformResponse: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            workspace_id: string;
-            platform: string;
-            bot_identity?: string | null;
-            display_name: string;
-            /** Format: date-time */
-            created_at: string;
-        };
-        ExternalChannel: {
-            id: string;
-            name: string;
-            group_name?: string | null;
-        };
+        /** ChannelLinkResponse */
         ChannelLinkResponse: {
-            /** Format: uuid */
+            /**
+             * Id
+             * Format: uuid
+             */
             id: string;
-            /** Format: uuid */
+            /**
+             * Channel Id
+             * Format: uuid
+             */
             channel_id: string;
-            /** Format: uuid */
+            /**
+             * Platform Id
+             * Format: uuid
+             */
             platform_id: string;
+            /** Platform */
             platform: string;
+            /** External Channel Id */
             external_channel_id: string;
+            /** External Channel Name */
             external_channel_name: string;
-            /** Format: date-time */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
         };
-        ConnectSlackRequest: {
-            /** Format: uuid */
+        /** ChannelMemberResponse */
+        ChannelMemberResponse: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
+            /** Email */
+            email: string;
+            /** Avatar Color */
+            avatar_color: string;
+            /**
+             * Joined At
+             * Format: date-time
+             */
+            joined_at: string;
+        };
+        /** ChannelResponse */
+        ChannelResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
             workspace_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** Citation */
+        Citation: {
+            /**
+             * Message Id
+             * Format: uuid
+             */
+            message_id: string;
+            /** Author Name */
+            author_name: string;
+            /** Channel Name */
+            channel_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Snippet */
+            snippet: string;
+        };
+        /** ClearChannelResponse */
+        ClearChannelResponse: {
+            /**
+             * Channel Id
+             * Format: uuid
+             */
+            channel_id: string;
+            /**
+             * Cleared At
+             * Format: date-time
+             */
+            cleared_at: string;
+        };
+        /** ConnectDiscordRequest */
+        ConnectDiscordRequest: {
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Bot Token */
             bot_token: string;
+        };
+        /** ConnectSlackRequest */
+        ConnectSlackRequest: {
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Bot Token */
+            bot_token: string;
+            /** App Token */
             app_token: string;
         };
-        ConnectDiscordRequest: {
-            /** Format: uuid */
+        /** ConnectedPlatformResponse */
+        ConnectedPlatformResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
             workspace_id: string;
-            bot_token: string;
+            /** Platform */
+            platform: string;
+            /** Bot Identity */
+            bot_identity?: string | null;
+            /** Display Name */
+            display_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
+        /** CreateChannelRequest */
+        CreateChannelRequest: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+        };
+        /** CreateInviteResponse */
+        CreateInviteResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Token */
+            token: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CreateMessageRequest */
+        CreateMessageRequest: {
+            /** Body */
+            body: string;
+            /** Parent Id */
+            parent_id?: string | null;
+        };
+        /** CreateWorkspaceRequest */
+        CreateWorkspaceRequest: {
+            /** Name */
+            name: string;
+        };
+        /** DraftReplyRequest */
+        DraftReplyRequest: {
+            /**
+             * Message Id
+             * Format: uuid
+             */
+            message_id: string;
+        };
+        /** DraftReplyResponse */
+        DraftReplyResponse: {
+            /** Draft */
+            draft: string;
+        };
+        /** ExternalChannel */
+        ExternalChannel: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Group Name */
+            group_name?: string | null;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** InvitePreviewResponse */
+        InvitePreviewResponse: {
+            /** Workspace Name */
+            workspace_name: string;
+            /** Inviter Name */
+            inviter_name: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Is Expired */
+            is_expired: boolean;
+        };
+        /** LinkChannelRequest */
         LinkChannelRequest: {
-            /** Format: uuid */
+            /**
+             * Platform Id
+             * Format: uuid
+             */
             platform_id: string;
+            /** External Channel Id */
             external_channel_id: string;
+            /** External Channel Name */
             external_channel_name: string;
         };
-    };
-    responses: {
-        /** @description Standard error response */
-        ErrorResponse: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorDetail"];
-            };
+        /** LoginRequest */
+        LoginRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** MessageAuthor */
+        MessageAuthor: {
+            /** Id */
+            id?: string | null;
+            /** Name */
+            name: string;
+            /** Avatar Color */
+            avatar_color?: string | null;
+            /**
+             * Is External
+             * @default false
+             */
+            is_external: boolean;
+        };
+        /** MessageResponse */
+        MessageResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Channel Id
+             * Format: uuid
+             */
+            channel_id: string;
+            author: components["schemas"]["MessageAuthor"];
+            /** Body */
+            body: string;
+            /** Source */
+            source: string;
+            /** Parent Id */
+            parent_id?: string | null;
+            /** External Id */
+            external_id?: string | null;
+            /** External Channel Id */
+            external_channel_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Edited At */
+            edited_at?: string | null;
+            /**
+             * Is Deleted
+             * @default false
+             */
+            is_deleted: boolean;
+            /**
+             * Reply Count
+             * @default 0
+             */
+            reply_count: number;
+            /** Last Reply At */
+            last_reply_at?: string | null;
+        };
+        /** MessagesPageResponse */
+        MessagesPageResponse: {
+            /** Items */
+            items: components["schemas"]["MessageResponse"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** SearchResult */
+        SearchResult: {
+            /**
+             * Message Id
+             * Format: uuid
+             */
+            message_id: string;
+            /**
+             * Channel Id
+             * Format: uuid
+             */
+            channel_id: string;
+            /** Channel Name */
+            channel_name: string;
+            /** Author Name */
+            author_name: string;
+            /** Body */
+            body: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Score
+             * @default 1
+             */
+            score: number;
+            /**
+             * Is Semantic
+             * @default false
+             */
+            is_semantic: boolean;
+        };
+        /** SignupRequest */
+        SignupRequest: {
+            /** Name */
+            name: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /** SummarizeRequest */
+        SummarizeRequest: {
+            /**
+             * Channel Id
+             * Format: uuid
+             */
+            channel_id: string;
+            /**
+             * Since Hours
+             * @default 24
+             */
+            since_hours: number;
+        };
+        /** SummarizeResponse */
+        SummarizeResponse: {
+            /** Summary */
+            summary: string;
+            /**
+             * Key Decisions
+             * @default []
+             */
+            key_decisions: string[];
+            /**
+             * Action Items
+             * @default []
+             */
+            action_items: string[];
+            /** Message Count */
+            message_count: number;
+        };
+        /** ThreadResponse */
+        ThreadResponse: {
+            parent: components["schemas"]["MessageResponse"];
+            /** Replies */
+            replies: components["schemas"]["MessageResponse"][];
+        };
+        /** UpdateMessageRequest */
+        UpdateMessageRequest: {
+            /** Body */
+            body: string;
+        };
+        /** UserResponse */
+        UserResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Avatar Color */
+            avatar_color: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+        };
+        /** WorkspaceMemberResponse */
+        WorkspaceMemberResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
+            /** Email */
+            email: string;
+            /** Avatar Color */
+            avatar_color: string;
+            /** Role */
+            role: string;
+            /**
+             * Joined At
+             * Format: date-time
+             */
+            joined_at: string;
+            /**
+             * Online
+             * @default false
+             */
+            online: boolean;
+        };
+        /** WorkspaceResponse */
+        WorkspaceResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Owner Id
+             * Format: uuid
+             */
+            owner_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Member Count
+             * @default 1
+             */
+            member_count: number;
         };
     };
+    responses: never;
     parameters: never;
     requestBodies: never;
     headers: never;
@@ -664,27 +1167,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getHealth: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Service health status */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HealthResponse"];
-                };
-            };
-        };
-    };
-    registerUser: {
+    signup_auth_signup_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -693,11 +1176,11 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RegisterRequest"];
+                "application/json": components["schemas"]["SignupRequest"];
             };
         };
         responses: {
-            /** @description User registered successfully */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -706,11 +1189,18 @@ export interface operations {
                     "application/json": components["schemas"]["AuthResponse"];
                 };
             };
-            400: components["responses"]["ErrorResponse"];
-            409: components["responses"]["ErrorResponse"];
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    loginUser: {
+    login_auth_login_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -723,7 +1213,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Login successful */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -732,19 +1222,31 @@ export interface operations {
                     "application/json": components["schemas"]["AuthResponse"];
                 };
             };
-            401: components["responses"]["ErrorResponse"];
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    getCurrentUser: {
+    get_me_auth_me_get: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Current user profile */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -753,19 +1255,31 @@ export interface operations {
                     "application/json": components["schemas"]["UserResponse"];
                 };
             };
-            401: components["responses"]["ErrorResponse"];
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    listWorkspaces: {
+    list_workspaces_workspaces_get: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description List of workspaces */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -774,12 +1288,25 @@ export interface operations {
                     "application/json": components["schemas"]["WorkspaceResponse"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    createWorkspace: {
+    create_workspace_workspaces_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -789,7 +1316,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Workspace created */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -798,12 +1325,25 @@ export interface operations {
                     "application/json": components["schemas"]["WorkspaceResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    deleteWorkspace: {
+    delete_workspace_workspaces__workspace_id__delete: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 workspace_id: string;
             };
@@ -811,27 +1351,34 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Workspace deleted successfully */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": {
-                        /** @example ok */
-                        status?: string;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
-            401: components["responses"]["ErrorResponse"];
-            403: components["responses"]["ErrorResponse"];
-            404: components["responses"]["ErrorResponse"];
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    listWorkspaceMembers: {
+    leave_workspace_workspaces__workspace_id__leave_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 workspace_id: string;
             };
@@ -839,7 +1386,78 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description List of workspace members */
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_workspace_member_workspaces__workspace_id__members__user_id__delete: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                workspace_id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_workspace_members_workspaces__workspace_id__members_get: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -848,12 +1466,25 @@ export interface operations {
                     "application/json": components["schemas"]["WorkspaceMemberResponse"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    createInvite: {
+    create_invite_workspaces__workspace_id__invites_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 workspace_id: string;
             };
@@ -861,7 +1492,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Invite token generated */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -870,9 +1501,18 @@ export interface operations {
                     "application/json": components["schemas"]["CreateInviteResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    getInvitePreview: {
+    get_invite_preview_invites__token__get: {
         parameters: {
             query?: never;
             header?: never;
@@ -883,7 +1523,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Invite details */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -892,20 +1532,31 @@ export interface operations {
                     "application/json": components["schemas"]["InvitePreviewResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    acceptInvite: {
+    accept_invite_invites__token__accept_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
-                token: string;
+                token: string | null;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Invite accepted */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -914,12 +1565,25 @@ export interface operations {
                     "application/json": components["schemas"]["AcceptInviteResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    listChannels: {
+    list_workspace_channels_workspaces__workspace_id__channels_get: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 workspace_id: string;
             };
@@ -927,7 +1591,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description List of channels */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -936,12 +1600,25 @@ export interface operations {
                     "application/json": components["schemas"]["ChannelResponse"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    createChannel: {
+    create_channel_workspaces__workspace_id__channels_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 workspace_id: string;
             };
@@ -953,7 +1630,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Channel created */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -962,12 +1639,25 @@ export interface operations {
                     "application/json": components["schemas"]["ChannelResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    joinChannel: {
+    join_channel_channels__channel_id__join_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -975,19 +1665,34 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Joined channel */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
-    leaveChannel: {
+    leave_channel_channels__channel_id__leave_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -995,19 +1700,34 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Left channel */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
-    listChannelMembers: {
+    list_channel_members_channels__channel_id__members_get: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -1015,7 +1735,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Channel members list */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1024,15 +1744,27 @@ export interface operations {
                     "application/json": components["schemas"]["ChannelMemberResponse"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    listMessages: {
+    get_channel_messages_channels__channel_id__messages_get: {
         parameters: {
             query?: {
-                cursor?: string;
+                cursor?: string | null;
                 limit?: number;
+                token?: string | null;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -1040,7 +1772,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Paginated messages */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1049,12 +1781,25 @@ export interface operations {
                     "application/json": components["schemas"]["MessagesPageResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    createMessage: {
+    create_message_channels__channel_id__messages_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -1066,7 +1811,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Message created */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1075,12 +1820,60 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    deleteMessage: {
+    clear_channel_channels__channel_id__clear_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                channel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClearChannelResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_thread_messages__message_id__thread_get: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 message_id: string;
             };
@@ -1088,7 +1881,42 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Message deleted */
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThreadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_message_messages__message_id__delete: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1097,12 +1925,25 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    updateMessage: {
+    update_message_messages__message_id__patch: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 message_id: string;
             };
@@ -1114,7 +1955,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Message updated */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1123,34 +1964,55 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponse"];
                 };
             };
-        };
-    };
-    getThread: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                message_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Message thread */
-            200: {
+            /** @description Validation Error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ThreadResponse"];
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
     };
-    listIntegrations: {
+    start_slack_oauth_integrations_slack_oauth_start_get: {
         parameters: {
             query: {
                 workspace_id: string;
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    slack_oauth_callback_integrations_slack_oauth_callback_get: {
+        parameters: {
+            query?: {
+                code?: string | null;
+                state?: string | null;
+                error?: string | null;
             };
             header?: never;
             path?: never;
@@ -1158,7 +2020,39 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description List of connected integrations */
+            /** @description Successful Response */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_integrations_integrations_get: {
+        parameters: {
+            query: {
+                workspace_id: string;
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1167,54 +2061,95 @@ export interface operations {
                     "application/json": components["schemas"]["ConnectedPlatformResponse"][];
                 };
             };
-        };
-    };
-    startSlackOAuth: {
-        parameters: {
-            query: {
-                workspace_id: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Redirect to Slack authorization URL */
-            302: {
+            /** @description Validation Error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
-    slackOAuthCallback: {
+    list_workspace_channel_links_workspaces__workspace_id__channel_links_get: {
         parameters: {
             query?: {
-                code?: string;
-                state?: string;
-                error?: string;
+                token?: string | null;
             };
-            header?: never;
-            path?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                workspace_id: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Redirect to frontend integrations page with status */
-            302: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ChannelLinkResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
-    connectSlack: {
+    get_channel_links_channels__channel_id__links_get: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                channel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChannelLinkResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_slack_integrations_slack_connect_post: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1224,7 +2159,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Slack integration connected */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1233,12 +2168,25 @@ export interface operations {
                     "application/json": components["schemas"]["ConnectedPlatformResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    connectDiscord: {
+    connect_discord_integrations_discord_connect_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1248,7 +2196,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Discord integration connected */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1257,12 +2205,25 @@ export interface operations {
                     "application/json": components["schemas"]["ConnectedPlatformResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    deleteIntegration: {
+    delete_integration_integrations__platform_id__delete: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 platform_id: string;
             };
@@ -1270,19 +2231,34 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Platform disconnected */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
             };
         };
     };
-    listExternalChannels: {
+    list_external_channels_integrations__platform_id__external_channels_get: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 platform_id: string;
             };
@@ -1290,7 +2266,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description List of external channels */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1299,12 +2275,25 @@ export interface operations {
                     "application/json": components["schemas"]["ExternalChannel"][];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    linkChannel: {
+    link_channel_channels__channel_id__link_post: {
         parameters: {
-            query?: never;
-            header?: never;
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -1316,7 +2305,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Channel linked successfully */
+            /** @description Successful Response */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1325,14 +2314,26 @@ export interface operations {
                     "application/json": components["schemas"]["ChannelLinkResponse"];
                 };
             };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
         };
     };
-    unlinkChannel: {
+    unlink_channel_channels__channel_id__link_delete: {
         parameters: {
             query: {
                 platform: string;
+                token?: string | null;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 channel_id: string;
             };
@@ -1340,12 +2341,225 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Channel unlinked successfully */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    chat_with_assistant_assistant_chat_post: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistantChatRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChatResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_assistant_history_assistant_history_get: {
+        parameters: {
+            query: {
+                workspace_id: string;
+                session_id: string;
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChatResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    summarize_channel_assistant_summarize_post: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SummarizeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SummarizeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    draft_reply_assistant_draft_reply_post: {
+        parameters: {
+            query?: {
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DraftReplyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DraftReplyResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_messages_search_get: {
+        parameters: {
+            query: {
+                workspace_id: string;
+                q: string;
+                limit?: number;
+                token?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchResult"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    health_check_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
             };
         };
     };

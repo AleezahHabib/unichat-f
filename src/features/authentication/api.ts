@@ -3,7 +3,8 @@ import { components } from "@/types/api";
 
 export type User = components["schemas"]["UserResponse"];
 export type AuthResponse = components["schemas"]["AuthResponse"];
-export type RegisterRequest = components["schemas"]["RegisterRequest"];
+export type SignupRequest = components["schemas"]["SignupRequest"];
+export type RegisterRequest = SignupRequest;
 export type LoginRequest = components["schemas"]["LoginRequest"];
 
 export async function signup(data: RegisterRequest): Promise<AuthResponse> {

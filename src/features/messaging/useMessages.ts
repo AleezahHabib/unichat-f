@@ -7,7 +7,7 @@ import {
   createMessage as apiCreateMessage,
   updateMessage as apiUpdateMessage,
   deleteMessage as apiDeleteMessage,
-  clearChannelMessages as apiClearChannelMessages,
+  clearChannelForMe as apiClearChannelForMe,
   Message,
 } from "./api";
 
@@ -76,13 +76,6 @@ export function useMessages(channelId: string) {
       }
     });
 
-    const unsubCleared = wsClient.on("messages.cleared", (evt) => {
-      if (evt.channel_id === channelId) {
-        setMessages([]);
-        setNextCursor(null);
-      }
-    });
-
     const unsubThread = wsClient.on("thread.reply", (evt) => {
       if (evt.channel_id === channelId) {
         const { parent_id, reply_count, last_reply_at } = evt.data;
@@ -100,7 +93,6 @@ export function useMessages(channelId: string) {
       unsubCreated();
       unsubUpdated();
       unsubDeleted();
-      unsubCleared();
       unsubThread();
     };
   }, [channelId]);
@@ -151,7 +143,7 @@ export function useMessages(channelId: string) {
   }, []);
 
   const clearMessages = useCallback(async () => {
-    await apiClearChannelMessages(channelId);
+    await apiClearChannelForMe(channelId);
     setMessages([]);
     setNextCursor(null);
   }, [channelId]);
@@ -170,4 +162,3 @@ export function useMessages(channelId: string) {
     refresh: fetchInitial,
   };
 }
-

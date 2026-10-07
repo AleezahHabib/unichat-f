@@ -39,6 +39,21 @@ export async function acceptInvite(token: string): Promise<{ workspace_id: strin
   });
 }
 
+export async function leaveWorkspace(workspaceId: string): Promise<{ message: string }> {
+  return apiClient<{ message: string }>(`/workspaces/${workspaceId}/leave`, {
+    method: "POST",
+  });
+}
+
+export async function removeWorkspaceMember(
+  workspaceId: string,
+  userId: string
+): Promise<{ message: string }> {
+  return apiClient<{ message: string }>(`/workspaces/${workspaceId}/members/${userId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function getChannels(workspaceId: string): Promise<Channel[]> {
   return apiClient<Channel[]>(`/workspaces/${workspaceId}/channels`);
 }

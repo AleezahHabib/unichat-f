@@ -4,6 +4,7 @@ import { components } from "@/types/api";
 export type Message = components["schemas"]["MessageResponse"];
 export type MessagesPage = components["schemas"]["MessagesPageResponse"];
 export type Thread = components["schemas"]["ThreadResponse"];
+export type ClearChannelResponse = components["schemas"]["ClearChannelResponse"];
 
 export async function getChannelMessages(
   channelId: string,
@@ -41,18 +42,14 @@ export async function deleteMessage(messageId: string): Promise<Message> {
   });
 }
 
-export async function clearChannelMessages(
+export async function clearChannelForMe(
   channelId: string
-): Promise<{ status: string; deleted_count: number }> {
-  return apiClient<{ status: string; deleted_count: number }>(
-    `/channels/${channelId}/messages`,
-    {
-      method: "DELETE",
-    }
-  );
+): Promise<ClearChannelResponse> {
+  return apiClient<ClearChannelResponse>(`/channels/${channelId}/clear`, {
+    method: "POST",
+  });
 }
 
 export async function getThread(messageId: string): Promise<Thread> {
   return apiClient<Thread>(`/messages/${messageId}/thread`);
 }
-

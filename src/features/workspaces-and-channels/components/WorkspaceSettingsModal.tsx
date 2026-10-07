@@ -1,30 +1,31 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  X,
-  Users,
-  Link as LinkIcon,
-  Trash2,
-  Copy,
-  Check,
-  Loader2,
-  ShieldAlert,
-  Crown,
-  AlertTriangle,
-  UserCheck,
-  Blocks,
-} from "lucide-react";
 import {
   getWorkspaceMembers,
   createInvite,
   deleteWorkspace,
+  leaveWorkspace,
+  removeWorkspaceMember,
   WorkspaceMember,
 } from "../api";
 import { OnlineDot } from "@/features/realtime/components/OnlineDot";
-
-type Tab = "members" | "invite" | "danger";
+import {
+  Users,
+  UserPlus,
+  Trash2,
+  Copy,
+  Check,
+  Crown,
+  UserCheck,
+  AlertTriangle,
+  Loader2,
+  Link as LinkIcon,
+  ShieldAlert,
+  LogOut,
+  UserMinus,
+} from "lucide-react";
 
 interface WorkspaceSettingsModalProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ interface WorkspaceSettingsModalProps {
   workspaceName: string;
   currentUserId?: string;
 }
+
+type Tab = "members" | "invite" | "leave" | "danger";
 
 export function WorkspaceSettingsModal({
   isOpen,
@@ -45,7 +48,7 @@ export function WorkspaceSettingsModal({
   const [activeTab, setActiveTab] = useState<Tab>("members");
 
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
-  const [membersLoading, setMembersLoading] = useState(false);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
   const [inviteLink, setInviteLink] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -56,52 +59,53 @@ export function WorkspaceSettingsModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
+
+  const [targetMember, setTargetMember] = useState<WorkspaceMember | null>(null);
+  const [isRemovingMember, setIsRemovingMember] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    async function load() {
+      setIsLoadingMembers(true);
+      try {
+        const list = await getWorkspaceMembers(workspaceId);
+        setMembers(list);
+      } catch (err) {
+        console.error("Failed to load members", err);
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    }
+    load();
+    setInviteLink(null);
+    setCopied(false);
+    setInviteError(null);
+    setDeleteConfirm("");
+    setDeleteError(null);
+    setLeaveError(null);
+    setActiveTab("members");
+  }, [isOpen, workspaceId]);
+
+  if (!isOpen) return null;
+
   const currentMember = members.find(
     (m) => m.user_id === currentUserId || m.id === currentUserId
   );
-  const isOwner = currentMember?.role === "owner";
-
-  const loadMembers = useCallback(async () => {
-    if (!isOpen) return;
-    setMembersLoading(true);
-    try {
-      const list = await getWorkspaceMembers(workspaceId);
-      setMembers(list);
-    } catch {
-      // silently fail
-    } finally {
-      setMembersLoading(false);
-    }
-  }, [isOpen, workspaceId]);
-
-  useEffect(() => {
-    if (isOpen) {
-      loadMembers();
-      setActiveTab("members");
-      setInviteLink(null);
-      setInviteError(null);
-      setDeleteConfirm("");
-      setDeleteError(null);
-    }
-  }, [isOpen, loadMembers]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onClose]);
+  const isOwner = currentMember ? currentMember.role === "owner" : false;
 
   const handleGenerateInvite = async () => {
     setIsGenerating(true);
     setInviteError(null);
     try {
-      const inv = await createInvite(workspaceId);
-      const url = `${window.location.origin}/invite/${inv.token}`;
-      setInviteLink(url);
+      const res = await createInvite(workspaceId);
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "";
+      setInviteLink(`${origin}/invite/${res.token}`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to generate invite link.";
+      const msg =
+        err instanceof Error ? err.message : "Failed to create invite link";
       setInviteError(msg);
     } finally {
       setIsGenerating(false);
@@ -109,15 +113,14 @@ export function WorkspaceSettingsModal({
   };
 
   const handleCopy = () => {
-    if (inviteLink) {
-      navigator.clipboard.writeText(inviteLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    if (!inviteLink) return;
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDelete = async () => {
-    if (deleteConfirm !== workspaceName) return;
+    if (!isOwner) return;
     setIsDeleting(true);
     setDeleteError(null);
     try {
@@ -125,111 +128,148 @@ export function WorkspaceSettingsModal({
       onClose();
       router.push("/workspaces");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to delete workspace.";
+      const msg =
+        err instanceof Error ? err.message : "Failed to delete workspace";
       setDeleteError(msg);
       setIsDeleting(false);
     }
   };
 
-  if (!isOpen) return null;
+  const handleLeave = async () => {
+    if (isOwner) return;
+    setIsLeaving(true);
+    setLeaveError(null);
+    try {
+      await leaveWorkspace(workspaceId);
+      onClose();
+      router.push("/workspaces");
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error ? err.message : "Failed to leave workspace";
+      setLeaveError(msg);
+      setIsLeaving(false);
+    }
+  };
 
-  const tabs: { id: Tab | "integrations"; label: string; icon: React.ReactNode; isLink?: boolean }[] = [
-    { id: "members", label: "Members", icon: <Users className="w-4 h-4" /> },
-    { id: "invite", label: "Invite", icon: <LinkIcon className="w-4 h-4" /> },
-    { id: "integrations", label: "Integrations", icon: <Blocks className="w-4 h-4" />, isLink: true },
-    ...(isOwner
-      ? [{ id: "danger" as Tab, label: "Danger Zone", icon: <Trash2 className="w-4 h-4" /> }]
-      : []),
-  ];
+  const handleRemoveMember = async () => {
+    if (!targetMember) return;
+    setIsRemovingMember(true);
+    try {
+      await removeWorkspaceMember(workspaceId, targetMember.user_id);
+      setMembers((prev) => prev.filter((m) => m.user_id !== targetMember.user_id));
+      setTargetMember(null);
+    } catch (err) {
+      console.error("Failed to remove member", err);
+    } finally {
+      setIsRemovingMember(false);
+    }
+  };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative w-full max-w-lg bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[88vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 shrink-0">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+        {/* Header */}
+        <div className="p-5 border-b border-[var(--color-border)] flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-[var(--color-ink)] font-[var(--font-headline)]">
-              Workspace Settings
-            </h2>
-            <p className="text-xs text-[var(--color-ink-muted)] mt-0.5 truncate max-w-xs">
+            <h2 className="text-lg font-bold text-[var(--color-ink)] font-[var(--font-headline)]">
               {workspaceName}
+            </h2>
+            <p className="text-xs text-[var(--color-ink-muted)]">
+              Workspace Settings &amp; Members
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] transition cursor-pointer"
+            className="p-1 rounded-lg text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] transition cursor-pointer"
           >
-            <X className="w-4 h-4" />
+            ✕
           </button>
         </div>
 
-        <div className="flex border-b border-[var(--color-border)] px-4 shrink-0">
-          {tabs.map((tab) => (
+        {/* Tabs */}
+        <div className="flex border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/40 px-4">
+          <button
+            onClick={() => setActiveTab("members")}
+            className={`flex items-center gap-1.5 py-3 px-3 text-xs font-semibold border-b-2 transition cursor-pointer ${
+              activeTab === "members"
+                ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                : "border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+            }`}
+          >
+            <Users className="w-3.5 h-3.5" />
+            Members ({members.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("invite")}
+            className={`flex items-center gap-1.5 py-3 px-3 text-xs font-semibold border-b-2 transition cursor-pointer ${
+              activeTab === "invite"
+                ? "border-[var(--color-primary)] text-[var(--color-primary)]"
+                : "border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+            }`}
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            Invite
+          </button>
+
+          {!isOwner && (
             <button
-              key={tab.id}
-              onClick={() => {
-                if (tab.isLink) {
-                  onClose();
-                  router.push(`/workspace/${workspaceId}/settings/${tab.id}`);
-                } else {
-                  setActiveTab(tab.id as Tab);
-                }
-              }}
-              className={`flex items-center gap-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition cursor-pointer ${
-                activeTab === tab.id
-                  ? tab.id === "danger"
-                    ? "border-[var(--color-danger)] text-[var(--color-danger)]"
-                    : "border-[var(--color-primary)] text-[var(--color-primary)]"
-                  : "border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
+              onClick={() => setActiveTab("leave")}
+              className={`flex items-center gap-1.5 py-3 px-3 text-xs font-semibold border-b-2 transition cursor-pointer ${
+                activeTab === "leave"
+                  ? "border-[var(--color-danger)] text-[var(--color-danger)]"
+                  : "border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-danger)]"
               }`}
             >
-              {tab.icon}
-              {tab.label}
+              <LogOut className="w-3.5 h-3.5" />
+              Leave
             </button>
-          ))}
+          )}
+
+          {isOwner && (
+            <button
+              onClick={() => setActiveTab("danger")}
+              className={`flex items-center gap-1.5 py-3 px-3 text-xs font-semibold border-b-2 transition cursor-pointer ml-auto ${
+                activeTab === "danger"
+                  ? "border-red-500 text-red-500"
+                  : "border-transparent text-[var(--color-ink-muted)] hover:text-red-500"
+              }`}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Delete Workspace
+            </button>
+          )}
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        {/* Tab Content */}
+        <div className="overflow-y-auto flex-1">
           {activeTab === "members" && (
-            <div className="p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-[var(--color-ink-muted)]">
-                  {members.length} member{members.length !== 1 ? "s" : ""} in this workspace
-                </p>
-                <button
-                  onClick={loadMembers}
-                  className="text-xs text-[var(--color-primary)] hover:underline cursor-pointer"
-                >
-                  Refresh
-                </button>
-              </div>
-              {membersLoading ? (
-                <div className="py-10 flex justify-center">
-                  <Loader2 className="w-6 h-6 animate-spin text-[var(--color-primary)]" />
+            <div className="p-4 space-y-3">
+              {isLoadingMembers ? (
+                <div className="py-8 flex justify-center">
+                  <div className="w-6 h-6 border-2 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" />
                 </div>
-              ) : members.length === 0 ? (
-                <div className="py-10 text-center text-sm text-[var(--color-ink-muted)]">No members found</div>
               ) : (
-                <div className="space-y-1">
+                <div className="divide-y divide-[var(--color-border)] rounded-xl border border-[var(--color-border)] overflow-hidden">
                   {members.map((m) => {
-                    const isCurrentUser = m.user_id === currentUserId || m.id === currentUserId;
+                    const isMe =
+                      m.user_id === currentUserId || m.id === currentUserId;
+                    const isMemOwner = m.role === "owner";
+                    const canRemove = isOwner && !isMemOwner && !isMe;
+
                     return (
                       <div
-                        key={m.user_id || m.id}
-                        className={`flex items-center justify-between p-3 rounded-xl transition ${
-                          isCurrentUser
-                            ? "bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20"
-                            : "hover:bg-[var(--color-surface-2)]"
-                        }`}
+                        key={m.id}
+                        className="p-3.5 flex items-center justify-between hover:bg-[var(--color-surface-2)]/30 transition"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="relative shrink-0">
                             <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0"
-                              style={{ backgroundColor: m.avatar_color || "var(--color-primary)" }}
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm"
+                              style={{
+                                backgroundColor:
+                                  m.avatar_color || "var(--color-primary)",
+                              }}
                             >
                               {m.name ? m.name[0].toUpperCase() : "U"}
                             </div>
@@ -237,30 +277,45 @@ export function WorkspaceSettingsModal({
                               <OnlineDot userId={m.user_id} />
                             </div>
                           </div>
-                          <div>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-sm font-semibold text-[var(--color-ink)]">{m.name}</span>
-                              {isCurrentUser && (
-                                <span className="text-[10px] text-[var(--color-ink-muted)] font-medium">(you)</span>
+                          <div className="min-w-0 truncate">
+                            <div className="font-semibold text-xs text-[var(--color-ink)] flex items-center gap-1.5">
+                              <span className="truncate">{m.name}</span>
+                              {isMe && (
+                                <span className="px-1.5 py-0.2 rounded bg-[var(--color-surface-2)] text-[var(--color-ink-muted)] text-[9px] font-medium">
+                                  You
+                                </span>
                               )}
-                              {m.role === "owner" && (
+                              {isMemOwner ? (
                                 <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 text-[10px] font-bold uppercase">
                                   <Crown className="w-2.5 h-2.5" />
                                   Owner
                                 </span>
-                              )}
-                              {m.role === "member" && (
+                              ) : (
                                 <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[var(--color-surface-2)] text-[var(--color-ink-muted)] text-[10px] font-semibold uppercase border border-[var(--color-border)]">
                                   <UserCheck className="w-2.5 h-2.5" />
                                   Member
                                 </span>
                               )}
                             </div>
-                            <div className="text-xs text-[var(--color-ink-muted)]">{m.email}</div>
+                            <div className="text-[11px] text-[var(--color-ink-muted)] truncate">
+                              {m.email}
+                            </div>
                           </div>
                         </div>
-                        <div className="text-[10px] text-[var(--color-ink-muted)] shrink-0 ml-2">
-                          {new Date(m.joined_at).toLocaleDateString()}
+
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <div className="text-[10px] text-[var(--color-ink-muted)]">
+                            {new Date(m.joined_at).toLocaleDateString()}
+                          </div>
+                          {canRemove && (
+                            <button
+                              onClick={() => setTargetMember(m)}
+                              className="p-1 rounded-md text-[var(--color-ink-muted)] hover:text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 transition cursor-pointer"
+                              title={`Remove ${m.name}`}
+                            >
+                              <UserMinus className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
@@ -286,11 +341,15 @@ export function WorkspaceSettingsModal({
                 <>
                   <div className="p-4 rounded-xl bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/20">
                     <p className="text-sm font-semibold text-[var(--color-ink)] mb-1">
-                      Invite people to <span className="text-[var(--color-primary)]">{workspaceName}</span>
+                      Invite people to{" "}
+                      <span className="text-[var(--color-primary)]">
+                        {workspaceName}
+                      </span>
                     </p>
                     <p className="text-xs text-[var(--color-ink-muted)]">
-                      Anyone who joins via this link will be added as a <strong>Member</strong> — not as an owner.
-                      Links expire after <strong>7 days</strong>.
+                      Anyone who joins via this link will be added as a{" "}
+                      <strong>Member</strong> — not as an owner. Links expire after{" "}
+                      <strong>7 days</strong>.
                     </p>
                   </div>
                   {inviteError && (
@@ -318,11 +377,24 @@ export function WorkspaceSettingsModal({
                           onClick={handleCopy}
                           className="px-4 py-2.5 rounded-xl bg-[var(--color-primary)] text-white text-xs font-semibold hover:opacity-90 active:scale-95 transition flex items-center gap-1.5 shrink-0 cursor-pointer shadow-sm"
                         >
-                          {copied ? <><Check className="w-3.5 h-3.5" />Copied!</> : <><Copy className="w-3.5 h-3.5" />Copy</>}
+                          {copied ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              Copy
+                            </>
+                          )}
                         </button>
                       </div>
                       <button
-                        onClick={() => { setInviteLink(null); setInviteError(null); }}
+                        onClick={() => {
+                          setInviteLink(null);
+                          setInviteError(null);
+                        }}
                         className="text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] underline cursor-pointer"
                       >
                         Generate a new link
@@ -335,9 +407,15 @@ export function WorkspaceSettingsModal({
                       className="w-full py-2.5 px-4 rounded-xl bg-[var(--color-primary)] hover:opacity-90 active:scale-[0.98] text-white font-semibold text-sm transition shadow disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {isGenerating ? (
-                        <><Loader2 className="w-4 h-4 animate-spin" />Generating...</>
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Generating...
+                        </>
                       ) : (
-                        <><LinkIcon className="w-4 h-4" />Generate Invite Link</>
+                        <>
+                          <LinkIcon className="w-4 h-4" />
+                          Generate Invite Link
+                        </>
                       )}
                     </button>
                   )}
@@ -346,22 +424,78 @@ export function WorkspaceSettingsModal({
             </div>
           )}
 
+          {activeTab === "leave" && !isOwner && (
+            <div className="p-5 space-y-5">
+              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
+                <LogOut className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-[var(--color-ink)]">
+                    Leave Workspace
+                  </p>
+                  <p className="text-xs text-[var(--color-ink-muted)] mt-1">
+                    Are you sure you want to leave{" "}
+                    <strong className="text-[var(--color-ink)]">
+                      {workspaceName}
+                    </strong>
+                    ? You will lose access to all its channels and messages.
+                  </p>
+                </div>
+              </div>
+              {leaveError && (
+                <div className="flex items-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-[var(--color-danger)] text-xs">
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                  <span>{leaveError}</span>
+                </div>
+              )}
+              <button
+                onClick={handleLeave}
+                disabled={isLeaving}
+                className="w-full py-2.5 px-4 rounded-xl bg-[var(--color-danger)] hover:opacity-90 text-white font-semibold text-sm transition shadow disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isLeaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Leaving...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-4 h-4" />
+                    <span>Yes, Leave Workspace</span>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
           {activeTab === "danger" && isOwner && (
             <div className="p-5 space-y-5">
               <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-[var(--color-danger)] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-bold text-[var(--color-danger)]">Delete Workspace</p>
+                  <p className="text-sm font-bold text-[var(--color-danger)]">
+                    Delete Workspace
+                  </p>
                   <p className="text-xs text-[var(--color-ink-muted)] mt-1">
-                    This permanently deletes <strong className="text-[var(--color-ink)]">{workspaceName}</strong>,
-                    all its channels, messages, and member records.
-                    This action <strong className="text-[var(--color-danger)]">cannot be undone</strong>.
+                    This permanently deletes{" "}
+                    <strong className="text-[var(--color-ink)]">
+                      {workspaceName}
+                    </strong>
+                    , all its channels, messages, and member records. This
+                    action{" "}
+                    <strong className="text-[var(--color-danger)]">
+                      cannot be undone
+                    </strong>
+                    .
                   </p>
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-[var(--color-ink)]">
-                  Type <span className="font-bold text-[var(--color-danger)] font-mono">{workspaceName}</span> to confirm
+                  Type{" "}
+                  <span className="font-bold text-[var(--color-danger)] font-mono">
+                    {workspaceName}
+                  </span>{" "}
+                  to confirm
                 </label>
                 <input
                   type="text"
@@ -383,15 +517,60 @@ export function WorkspaceSettingsModal({
                 className="w-full py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-semibold text-sm transition shadow disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isDeleting ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" />Deleting...</>
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
                 ) : (
-                  <><Trash2 className="w-4 h-4" />Delete Workspace Permanently</>
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Workspace Permanently
+                  </>
                 )}
               </button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Remove Member Confirmation Modal */}
+      {targetMember && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3 text-[var(--color-danger)]">
+              <UserMinus className="w-5 h-5" />
+              <h3 className="font-bold text-lg text-[var(--color-ink)] font-[var(--font-headline)]">
+                Remove Member?
+              </h3>
+            </div>
+            <p className="text-xs text-[var(--color-ink-muted)] leading-relaxed">
+              Are you sure you want to remove{" "}
+              <strong className="text-[var(--color-ink)]">
+                {targetMember.name}
+              </strong>{" "}
+              from this workspace? They will be removed from all channels.
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setTargetMember(null)}
+                disabled={isRemovingMember}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[var(--color-surface-2)] text-[var(--color-ink)] hover:bg-[var(--color-border)] transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveMember}
+                disabled={isRemovingMember}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[var(--color-danger)] text-white hover:opacity-90 transition flex items-center gap-1.5 cursor-pointer"
+              >
+                {isRemovingMember ? "Removing..." : "Remove"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
