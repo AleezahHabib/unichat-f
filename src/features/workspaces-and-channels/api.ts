@@ -54,8 +54,12 @@ export async function removeWorkspaceMember(
   });
 }
 
-export async function getChannels(workspaceId: string): Promise<Channel[]> {
-  return apiClient<Channel[]>(`/workspaces/${workspaceId}/channels`);
+export async function getChannels(
+  workspaceId: string,
+  options?: { joined_only?: boolean }
+): Promise<Channel[]> {
+  const query = options?.joined_only ? "?joined_only=true" : "";
+  return apiClient<Channel[]>(`/workspaces/${workspaceId}/channels${query}`);
 }
 
 export async function createChannel(

@@ -1579,6 +1579,7 @@ export interface operations {
     list_workspace_channels_workspaces__workspace_id__channels_get: {
         parameters: {
             query?: {
+                joined_only?: boolean;
                 token?: string | null;
             };
             header?: {
