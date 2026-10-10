@@ -25,6 +25,7 @@ import {
   ShieldAlert,
   LogOut,
   UserMinus,
+  Blocks,
 } from "lucide-react";
 
 interface WorkspaceSettingsModalProps {
@@ -210,6 +211,17 @@ export function WorkspaceSettingsModal({
           >
             <UserPlus className="w-3.5 h-3.5" />
             Invite
+          </button>
+
+          <button
+            onClick={() => {
+              onClose();
+              router.push(`/workspace/${workspaceId}/settings/integrations`);
+            }}
+            className="flex items-center gap-1.5 py-3 px-3 text-xs font-semibold border-b-2 border-transparent text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition cursor-pointer"
+          >
+            <Blocks className="w-3.5 h-3.5 text-[#5865F2]" />
+            Integrations
           </button>
 
           {!isOwner && (

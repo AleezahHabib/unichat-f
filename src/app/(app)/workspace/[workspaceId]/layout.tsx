@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, use } from "react";
-import { Settings, Menu, X, Sparkles, Search as SearchIcon } from "lucide-react";
+import { Settings, Menu, X, Sparkles, Search as SearchIcon, Blocks } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/features/authentication/useAuth";
 import { getChannels, getWorkspaces, Channel, Workspace } from "@/features/workspaces-and-channels/api";
@@ -134,6 +134,14 @@ export default function WorkspaceLayout({
             >
               <SearchIcon className="w-3.5 h-3.5 text-[var(--color-ink-muted)]" />
               <span>Search messages</span>
+            </Link>
+            <Link
+              href={`/workspace/${workspaceId}/settings/integrations`}
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] transition"
+            >
+              <Blocks className="w-3.5 h-3.5 text-[#5865F2]" />
+              <span>Platform Integrations</span>
             </Link>
           </div>
 
