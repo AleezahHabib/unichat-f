@@ -4,21 +4,26 @@ import React, { useState } from "react";
 import { Message } from "../api";
 import { useAuth } from "@/features/authentication/useAuth";
 import { PlatformBadge } from "@/features/integrations/components/PlatformBadge";
+import { DraftReplyButton } from "@/features/ai-assistant/components/DraftReplyButton";
 
 interface MessageItemProps {
   message: Message;
   isCollapsed?: boolean;
+  isHighlighted?: boolean;
   onEdit: (messageId: string, body: string) => Promise<any>;
   onDelete: (messageId: string) => Promise<any>;
   onOpenThread?: (message: Message) => void;
+  onDraftReply?: (draftText: string) => void;
 }
 
 export function MessageItem({
   message,
   isCollapsed = false,
+  isHighlighted = false,
   onEdit,
   onDelete,
   onOpenThread,
+  onDraftReply,
 }: MessageItemProps) {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -83,7 +88,14 @@ export function MessageItem({
   );
 
   return (
-    <div className="group relative flex items-start gap-3 py-1.5 px-3 rounded-xl hover:bg-[var(--color-surface-2)]/60 transition">
+    <div
+      id={`msg-${message.id}`}
+      className={`group relative flex items-start gap-3 py-1.5 px-3 rounded-xl transition duration-500 ${
+        isHighlighted
+          ? "bg-[var(--color-ai)]/15 ring-2 ring-[var(--color-ai)] shadow-sm"
+          : "hover:bg-[var(--color-surface-2)]/60"
+      }`}
+    >
       {/* Avatar or time spacer */}
       {!isCollapsed ? (
         <div
@@ -145,6 +157,14 @@ export function MessageItem({
       {/* Action buttons on hover */}
       {!message.is_deleted && (
         <div className="absolute right-2 -top-2 hidden group-hover:flex items-center gap-1 p-1 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] shadow-md text-xs text-[var(--color-ink-muted)]">
+          {/* AI Draft Reply Button */}
+          {onDraftReply && (
+            <DraftReplyButton
+              messageId={message.id}
+              onDraftReady={onDraftReply}
+            />
+          )}
+
           {onOpenThread && (
             <button
               onClick={() => onOpenThread(message)}

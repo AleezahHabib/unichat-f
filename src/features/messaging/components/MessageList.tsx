@@ -12,6 +12,8 @@ interface MessageListProps {
   onEdit: (messageId: string, body: string) => Promise<any>;
   onDelete: (messageId: string) => Promise<any>;
   onOpenThread?: (message: Message) => void;
+  highlightMessageId?: string | null;
+  onDraftReply?: (draftText: string) => void;
 }
 
 export function MessageList({
@@ -22,13 +24,34 @@ export function MessageList({
   onEdit,
   onDelete,
   onOpenThread,
+  highlightMessageId,
+  onDraftReply,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [activeHighlight, setActiveHighlight] = React.useState<string | null>(null);
 
-  // Auto-scroll to bottom on new message
+  // Auto-scroll to bottom on new message unless jumping to highlight
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+    if (!highlightMessageId) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages.length, highlightMessageId]);
+
+  // Jump to highlighted message if present
+  useEffect(() => {
+    if (highlightMessageId) {
+      setActiveHighlight(highlightMessageId);
+      const el = document.getElementById(`msg-${highlightMessageId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      // Fade out highlight after 3.5 seconds
+      const timer = setTimeout(() => {
+        setActiveHighlight(null);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightMessageId, messages]);
 
   // Grouping logic: day headers & author collapse (within 5 minutes)
   const renderMessages = () => {
@@ -84,9 +107,11 @@ export function MessageList({
           <MessageItem
             message={msg}
             isCollapsed={isCollapsed}
+            isHighlighted={msg.id === activeHighlight}
             onEdit={onEdit}
             onDelete={onDelete}
             onOpenThread={onOpenThread}
+            onDraftReply={onDraftReply}
           />
         </React.Fragment>
       );

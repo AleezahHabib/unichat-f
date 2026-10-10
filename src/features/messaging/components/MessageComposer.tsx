@@ -6,18 +6,33 @@ interface MessageComposerProps {
   onSend: (body: string) => Promise<any>;
   onTyping?: () => void;
   placeholder?: string;
+  draftValue?: string;
+  onClearDraft?: () => void;
 }
 
 export function MessageComposer({
   onSend,
   onTyping,
   placeholder = "Write a message...",
+  draftValue,
+  onClearDraft,
 }: MessageComposerProps) {
-  const [body, setBody] = useState("");
-  const [isSending, setIsSending] = useState(false);
+  const [body, setBody] = React.useState("");
+  const [isSending, setIsSending] = React.useState(false);
+  const [isAiDraft, setIsAiDraft] = React.useState(false);
+
+  React.useEffect(() => {
+    if (draftValue) {
+      setBody(draftValue);
+      setIsAiDraft(true);
+    }
+  }, [draftValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBody(e.target.value);
+    if (isAiDraft && e.target.value !== draftValue) {
+      // User has begun editing
+    }
     if (onTyping && e.target.value.trim().length > 0) {
       onTyping();
     }
@@ -30,6 +45,12 @@ export function MessageComposer({
     }
   };
 
+  const handleDiscardDraft = () => {
+    setBody("");
+    setIsAiDraft(false);
+    if (onClearDraft) onClearDraft();
+  };
+
   const handleSubmit = async () => {
     const trimmed = body.trim();
     if (!trimmed || isSending) return;
@@ -37,6 +58,8 @@ export function MessageComposer({
     try {
       await onSend(trimmed);
       setBody("");
+      setIsAiDraft(false);
+      if (onClearDraft) onClearDraft();
     } catch (err: any) {
       console.error("Failed to send message", err);
     } finally {
@@ -48,6 +71,22 @@ export function MessageComposer({
 
   return (
     <div className="p-3 bg-[var(--color-surface)] border-t border-[var(--color-border)] space-y-2">
+      {/* AI Draft Banner */}
+      {isAiDraft && (
+        <div className="flex items-center justify-between px-3 py-1.5 rounded-lg bg-[var(--color-ai)]/10 border border-[var(--color-ai)]/30 text-xs text-[var(--color-ai)] font-medium">
+          <span className="flex items-center gap-1.5">
+            <span>✨</span>
+            <span>AI Drafted Reply — edit before sending (never auto-sent)</span>
+          </span>
+          <button
+            onClick={handleDiscardDraft}
+            className="text-[11px] hover:underline cursor-pointer opacity-80 hover:opacity-100"
+          >
+            Discard
+          </button>
+        </div>
+      )}
+
       <div className="relative">
         <textarea
           value={body}

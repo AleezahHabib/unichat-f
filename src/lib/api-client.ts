@@ -1,12 +1,14 @@
 export class ApiError extends Error {
   public code: string;
   public status: number;
+  public retryAfter?: number;
 
-  constructor(message: string, code: string = "INTERNAL_ERROR", status: number = 400) {
+  constructor(message: string, code: string = "INTERNAL_ERROR", status: number = 400, retryAfter?: number) {
     super(message);
     this.name = "ApiError";
     this.code = code;
     this.status = status;
+    this.retryAfter = retryAfter;
     Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
@@ -50,6 +52,7 @@ export async function apiClient<T>(
   if (!response.ok) {
     let detail = "An error occurred";
     let code = "UNKNOWN_ERROR";
+    let retryAfter: number | undefined = undefined;
     try {
       const errJson = await response.json();
       if (Array.isArray(errJson.detail)) {
@@ -60,10 +63,16 @@ export async function apiClient<T>(
         detail = errJson.detail;
         code = errJson.code || code;
       }
+      if (typeof errJson.retry_after_seconds === "number") {
+        retryAfter = errJson.retry_after_seconds;
+      } else if (detail.includes("Try again in ")) {
+        const match = detail.match(/Try again in (\d+) seconds/);
+        if (match) retryAfter = parseInt(match[1], 10);
+      }
     } catch {
       detail = response.statusText || detail;
     }
-    throw new ApiError(detail, code, response.status);
+    throw new ApiError(detail, code, response.status, retryAfter);
   }
 
   if (response.status === 204) {

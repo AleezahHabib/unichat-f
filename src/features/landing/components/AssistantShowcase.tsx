@@ -12,9 +12,6 @@ export function AssistantShowcase() {
               <Sparkles className="w-4 h-4 text-ai" />
               <span>Grounded Intelligence</span>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-ai/10 border border-ai/30 text-[11px] font-semibold text-ai">
-              Coming soon
-            </span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-headline text-ink leading-tight">
@@ -22,7 +19,7 @@ export function AssistantShowcase() {
           </h2>
 
           <p className="text-base text-ink-muted leading-relaxed">
-            The assistant has read everything the team said across FistaChat, Slack, and Discord, and every answer shows the exact messages it came from with direct clickable links.
+            The assistant has read everything the team said across UniChat, Slack, and Discord, and every answer shows the exact messages it came from with direct clickable links.
           </p>
 
           <div className="pt-2 flex items-center gap-2 text-xs font-medium text-ink-muted border-t border-ai/20">
@@ -36,7 +33,7 @@ export function AssistantShowcase() {
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-ai" />
-              <span className="font-bold text-sm text-ink">FistaChat Assistant</span>
+              <span className="font-bold text-sm text-ink">UniChat Assistant</span>
             </div>
             <span className="text-xs font-mono text-ai">Google Gemini 2.5 Flash</span>
           </div>

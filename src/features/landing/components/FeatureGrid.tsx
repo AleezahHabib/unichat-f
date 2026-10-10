@@ -96,15 +96,12 @@ export function FeatureGrid() {
               <div className="w-10 h-10 rounded-[10px] bg-ai/10 border border-ai/30 flex items-center justify-center text-ai">
                 <Search className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-ai/10 border border-ai/30 text-[10px] font-semibold text-ai">
-                Coming soon
-              </span>
             </div>
             <h3 className="text-lg font-bold font-headline text-ink">
               Search by meaning
             </h3>
             <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-              Find what you&apos;re looking for by concept and context across FistaChat, Slack, and Discord—even without exact keyword matches.
+              Find what you&apos;re looking for by concept and context across UniChat, Slack, and Discord—even without exact keyword matches.
             </p>
           </div>
         </div>
@@ -116,9 +113,6 @@ export function FeatureGrid() {
               <div className="w-10 h-10 rounded-[10px] bg-ai/10 border border-ai/30 flex items-center justify-center text-ai">
                 <FileText className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-ai/10 border border-ai/30 text-[10px] font-semibold text-ai">
-                Coming soon
-              </span>
             </div>
             <h3 className="text-lg font-bold font-headline text-ink">
               Channel recaps
@@ -136,9 +130,6 @@ export function FeatureGrid() {
               <div className="w-10 h-10 rounded-[10px] bg-ai/10 border border-ai/30 flex items-center justify-center text-ai">
                 <PenTool className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-ai/10 border border-ai/30 text-[10px] font-semibold text-ai">
-                Coming soon
-              </span>
             </div>
             <h3 className="text-lg font-bold font-headline text-ink">
               Draft replies

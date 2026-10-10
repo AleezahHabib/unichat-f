@@ -7,7 +7,7 @@ import {
   createMessage as apiCreateMessage,
   updateMessage as apiUpdateMessage,
   deleteMessage as apiDeleteMessage,
-  clearChannelForMe as apiClearChannelForMe,
+  clearChannelMessages as apiClearChannelMessages,
   Message,
 } from "./api";
 
@@ -76,6 +76,13 @@ export function useMessages(channelId: string) {
       }
     });
 
+    const unsubCleared = wsClient.on("messages.cleared", (evt) => {
+      if (evt.channel_id === channelId) {
+        setMessages([]);
+        setNextCursor(null);
+      }
+    });
+
     const unsubThread = wsClient.on("thread.reply", (evt) => {
       if (evt.channel_id === channelId) {
         const { parent_id, reply_count, last_reply_at } = evt.data;
@@ -93,6 +100,7 @@ export function useMessages(channelId: string) {
       unsubCreated();
       unsubUpdated();
       unsubDeleted();
+      unsubCleared();
       unsubThread();
     };
   }, [channelId]);
@@ -111,6 +119,27 @@ export function useMessages(channelId: string) {
       setIsFetchingMore(false);
     }
   }, [channelId, nextCursor, isFetchingMore]);
+
+  const ensureMessageLoaded = useCallback(
+    async (messageId: string): Promise<boolean> => {
+      if (messages.some((m) => m.id === messageId)) return true;
+      let cursor = nextCursor;
+      while (cursor) {
+        try {
+          const page = await getChannelMessages(channelId, cursor);
+          const older = [...page.items].reverse();
+          setMessages((prev) => [...older, ...prev]);
+          cursor = page.next_cursor || null;
+          setNextCursor(cursor);
+          if (older.some((m) => m.id === messageId)) return true;
+        } catch {
+          break;
+        }
+      }
+      return false;
+    },
+    [channelId, messages, nextCursor]
+  );
 
   const sendMessage = useCallback(
     async (body: string, parentId?: string) => {
@@ -143,7 +172,7 @@ export function useMessages(channelId: string) {
   }, []);
 
   const clearMessages = useCallback(async () => {
-    await apiClearChannelForMe(channelId);
+    await apiClearChannelMessages(channelId);
     setMessages([]);
     setNextCursor(null);
   }, [channelId]);
@@ -159,6 +188,8 @@ export function useMessages(channelId: string) {
     editMessage,
     removeMessage,
     clearMessages,
+    ensureMessageLoaded,
     refresh: fetchInitial,
   };
 }
+
