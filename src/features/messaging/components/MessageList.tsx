@@ -33,7 +33,7 @@ export function MessageList({
   // Grouping logic: day headers & author collapse (within 5 minutes)
   const renderMessages = () => {
     let lastDateStr = "";
-    let lastAuthorId: string | null = null;
+    let lastAuthorKey: string | null = null;
     let lastTime: number = 0;
 
     return messages.map((msg) => {
@@ -47,17 +47,27 @@ export function MessageList({
       const showDayHeader = dateStr !== lastDateStr;
       if (showDayHeader) {
         lastDateStr = dateStr;
-        lastAuthorId = null;
+        lastAuthorKey = null;
         lastTime = 0;
       }
 
       const msgTime = msgDate.getTime();
+      const isExternal = Boolean(
+        msg.author?.is_external || (msg.source && msg.source.toLowerCase() !== "unichat")
+      );
+      const currentAuthorKey = msg.author?.id
+        ? `user:${msg.author.id}`
+        : isExternal
+        ? `external:${msg.source}:${msg.author?.name}`
+        : null;
+
       const isCollapsed =
         !showDayHeader &&
-        msg.author.id === lastAuthorId &&
+        Boolean(currentAuthorKey) &&
+        currentAuthorKey === lastAuthorKey &&
         msgTime - lastTime < 5 * 60 * 1000;
 
-      lastAuthorId = msg.author.id || null;
+      lastAuthorKey = currentAuthorKey;
       lastTime = msgTime;
 
       return (

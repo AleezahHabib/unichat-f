@@ -77,13 +77,26 @@ export function MessageItem({
     );
   }
 
+  const isExternal = Boolean(
+    message.author?.is_external ||
+    (message.source && message.source.toLowerCase() !== "unichat")
+  );
+
   return (
     <div className="group relative flex items-start gap-3 py-1.5 px-3 rounded-xl hover:bg-[var(--color-surface-2)]/60 transition">
       {/* Avatar or time spacer */}
       {!isCollapsed ? (
         <div
           className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 mt-0.5 shadow-sm"
-          style={{ backgroundColor: message.author.avatar_color || "var(--color-primary)" }}
+          style={{
+            backgroundColor:
+              message.author.avatar_color ||
+              (message.source === "slack"
+                ? "#4A154B"
+                : message.source === "discord"
+                ? "#5865F2"
+                : "var(--color-primary)"),
+          }}
         >
           {message.author.name ? message.author.name[0].toUpperCase() : "U"}
         </div>
@@ -100,8 +113,8 @@ export function MessageItem({
             <span className="font-semibold text-sm text-[var(--color-ink)] truncate">
               {message.author.name}
             </span>
-            {message.author.is_external && (
-              <PlatformBadge platform={message.source} />
+            {isExternal && (
+              <PlatformBadge platform={message.source} showVia />
             )}
             <span className="text-[10px] text-[var(--color-ink-muted)]">{formattedTime}</span>
           </div>

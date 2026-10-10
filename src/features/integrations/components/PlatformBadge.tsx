@@ -5,18 +5,19 @@ import React from "react";
 interface PlatformBadgeProps {
   platform: "slack" | "discord" | string;
   channelName?: string;
+  showVia?: boolean;
 }
 
-export function PlatformBadge({ platform, channelName }: PlatformBadgeProps) {
+export function PlatformBadge({ platform, channelName, showVia = false }: PlatformBadgeProps) {
   const p = platform.toLowerCase();
 
   if (p === "slack") {
     return (
       <span
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-white text-[10px] font-bold shadow-xs"
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white text-[10px] font-bold shadow-xs shrink-0"
         style={{ backgroundColor: "#4A154B" }}
       >
-        <span>Slack</span>
+        <span>{showVia ? "via Slack" : "Slack"}</span>
         {channelName && <span className="opacity-80">#{channelName}</span>}
       </span>
     );
@@ -25,10 +26,10 @@ export function PlatformBadge({ platform, channelName }: PlatformBadgeProps) {
   if (p === "discord") {
     return (
       <span
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-white text-[10px] font-bold shadow-xs"
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white text-[10px] font-bold shadow-xs shrink-0"
         style={{ backgroundColor: "#5865F2" }}
       >
-        <span>Discord</span>
+        <span>{showVia ? "via Discord" : "Discord"}</span>
         {channelName && <span className="opacity-80">#{channelName}</span>}
       </span>
     );
