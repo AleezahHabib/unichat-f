@@ -1,35 +1,36 @@
 "use client";
 
-import { Link2, Trash2 } from "lucide-react";
-
-import React, { useState, useEffect, use } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect, useRef } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import { useMessages } from "@/features/messaging/useMessages";
 import { MessageList } from "@/features/messaging/components/MessageList";
 import { MessageComposer } from "@/features/messaging/components/MessageComposer";
 import { ThreadPanel } from "@/features/messaging/components/ThreadPanel";
-import { Message } from "@/features/messaging/api";
-import { getChannels, Channel } from "@/features/workspaces-and-channels/api";
 import { TypingIndicator } from "@/features/realtime/components/TypingIndicator";
 import { useRealtime } from "@/features/realtime/useRealtime";
 import {
+  getChannels,
+  Channel,
+} from "@/features/workspaces-and-channels/api";
+import {
   getIntegrations,
-  getWorkspaceChannelLinks,
   ConnectedPlatform,
+  getWorkspaceChannelLinks,
   ChannelLink,
 } from "@/features/integrations/api";
-import { LinkChannelModal } from "@/features/integrations/components/LinkChannelModal";
 import { PlatformBadge } from "@/features/integrations/components/PlatformBadge";
+import { LinkChannelModal } from "@/features/integrations/components/LinkChannelModal";
 import { SummaryButton } from "@/features/ai-assistant/components/SummaryButton";
+import { draftReply } from "@/features/ai-assistant/api";
+import { ApiError } from "@/lib/api-client";
+import { Message } from "@/features/messaging/api";
+import { Link2, Trash2 } from "lucide-react";
 
-export default function ChannelPage({
-  params,
-}: {
-  params: Promise<{ workspaceId: string; channelId: string }>;
-}) {
-  const resolvedParams = use(params);
-  const { workspaceId, channelId } = resolvedParams;
+export default function ChannelPage() {
+  const params = useParams();
   const searchParams = useSearchParams();
+  const workspaceId = params.workspaceId as string;
+  const channelId = params.channelId as string;
   const highlightMessageId = searchParams.get("messageId");
   const { sendTyping } = useRealtime();
 
@@ -38,7 +39,17 @@ export default function ChannelPage({
   const [activeThreadMessage, setActiveThreadMessage] = useState<Message | null>(null);
   const [connectedPlatforms, setConnectedPlatforms] = useState<ConnectedPlatform[]>([]);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+
+  // Draft state & AI notices
   const [draftReplyText, setDraftReplyText] = useState("");
+  const [draftingMessageId, setDraftingMessageId] = useState<string | null>(null);
+  const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
+  const [aiNotice, setAiNotice] = useState<{
+    code: string;
+    message: string;
+    retryAfter?: number;
+  } | null>(null);
+  const activeDraftRequestRef = useRef<number>(0);
 
   const [isClearModalOpen, setIsClearModalOpen] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
@@ -93,6 +104,55 @@ export default function ChannelPage({
   useEffect(() => {
     loadChannelInfo();
   }, [workspaceId, channelId]);
+
+  // Handle Draft Reply request
+  const handleDraftReplyClick = async (messageId: string) => {
+    const requestId = ++activeDraftRequestRef.current;
+    setDraftingMessageId(messageId);
+    setIsGeneratingDraft(true);
+    setAiNotice(null);
+
+    try {
+      const res = await draftReply(messageId);
+      if (activeDraftRequestRef.current === requestId) {
+        if (res && res.draft) {
+          setDraftReplyText(res.draft);
+        }
+      }
+    } catch (err: any) {
+      if (activeDraftRequestRef.current === requestId) {
+        if (err instanceof ApiError) {
+          if (err.code === "ai_disabled") {
+            setAiNotice({ code: "ai_disabled", message: "AI features are disabled" });
+          } else if (err.code === "ai_busy") {
+            setAiNotice({
+              code: "ai_busy",
+              message: "AI assistant is busy",
+              retryAfter: err.retryAfter || 15,
+            });
+          } else {
+            setAiNotice({ code: err.code, message: err.message });
+          }
+        } else {
+          setAiNotice({
+            code: "error",
+            message: err?.message || "Failed to generate draft reply",
+          });
+        }
+      }
+    } finally {
+      if (activeDraftRequestRef.current === requestId) {
+        setIsGeneratingDraft(false);
+        setDraftingMessageId(null);
+      }
+    }
+  };
+
+  const handleCancelDrafting = () => {
+    activeDraftRequestRef.current++;
+    setIsGeneratingDraft(false);
+    setDraftingMessageId(null);
+  };
 
   return (
     <div className="flex-1 flex h-full min-w-0 bg-[var(--color-bg)]">
@@ -163,7 +223,8 @@ export default function ChannelPage({
             onDelete={removeMessage}
             onOpenThread={(msg) => setActiveThreadMessage(msg)}
             highlightMessageId={highlightMessageId}
-            onDraftReply={(draft) => setDraftReplyText(draft)}
+            onDraftReply={handleDraftReplyClick}
+            draftingMessageId={draftingMessageId}
           />
         )}
 
@@ -177,6 +238,10 @@ export default function ChannelPage({
           placeholder={`Message #${channel?.name || "channel"}`}
           draftValue={draftReplyText}
           onClearDraft={() => setDraftReplyText("")}
+          isGeneratingDraft={isGeneratingDraft}
+          onCancelDrafting={handleCancelDrafting}
+          aiNotice={aiNotice}
+          onDismissNotice={() => setAiNotice(null)}
         />
       </div>
 
@@ -240,4 +305,3 @@ export default function ChannelPage({
     </div>
   );
 }
-

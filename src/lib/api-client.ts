@@ -65,8 +65,8 @@ export async function apiClient<T>(
       }
       if (typeof errJson.retry_after_seconds === "number") {
         retryAfter = errJson.retry_after_seconds;
-      } else if (detail.includes("Try again in ")) {
-        const match = detail.match(/Try again in (\d+) seconds/);
+      } else {
+        const match = detail.match(/in (\d+)\s*(s|sec|seconds)?/i);
         if (match) retryAfter = parseInt(match[1], 10);
       }
     } catch {

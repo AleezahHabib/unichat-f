@@ -5,6 +5,7 @@ import { Message } from "../api";
 import { useAuth } from "@/features/authentication/useAuth";
 import { PlatformBadge } from "@/features/integrations/components/PlatformBadge";
 import { DraftReplyButton } from "@/features/ai-assistant/components/DraftReplyButton";
+import { MessageSquare, Pencil, Trash2 } from "lucide-react";
 
 interface MessageItemProps {
   message: Message;
@@ -13,7 +14,8 @@ interface MessageItemProps {
   onEdit: (messageId: string, body: string) => Promise<any>;
   onDelete: (messageId: string) => Promise<any>;
   onOpenThread?: (message: Message) => void;
-  onDraftReply?: (draftText: string) => void;
+  onDraftReply?: (messageId: string) => void;
+  isDraftingThisMessage?: boolean;
 }
 
 export function MessageItem({
@@ -24,6 +26,7 @@ export function MessageItem({
   onDelete,
   onOpenThread,
   onDraftReply,
+  isDraftingThisMessage = false,
 }: MessageItemProps) {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -67,13 +70,13 @@ export function MessageItem({
         <div className="flex justify-end gap-2 text-xs">
           <button
             onClick={() => setIsEditing(false)}
-            className="px-3 py-1 rounded bg-[var(--color-surface)] text-[var(--color-ink-muted)]"
+            className="px-3 py-1 rounded bg-[var(--color-surface)] text-[var(--color-ink-muted)] cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleSaveEdit}
-            className="px-3 py-1 rounded bg-[var(--color-primary)] text-white font-medium"
+            className="px-3 py-1 rounded bg-[var(--color-primary)] text-white font-medium cursor-pointer"
           >
             Save
           </button>
@@ -147,7 +150,7 @@ export function MessageItem({
         {message.reply_count > 0 && onOpenThread && (
           <button
             onClick={() => onOpenThread(message)}
-            className="mt-1 flex items-center gap-1.5 text-xs text-[var(--color-primary)] font-medium hover:underline"
+            className="mt-1 flex items-center gap-1.5 text-xs text-[var(--color-primary)] font-medium hover:underline cursor-pointer"
           >
             <span>💬 {message.reply_count} {message.reply_count === 1 ? "reply" : "replies"}</span>
           </button>
@@ -156,12 +159,13 @@ export function MessageItem({
 
       {/* Action buttons on hover */}
       {!message.is_deleted && (
-        <div className="absolute right-2 -top-2 hidden group-hover:flex items-center gap-1 p-1 rounded-lg bg-[var(--color-surface)] border border-[var(--color-border)] shadow-md text-xs text-[var(--color-ink-muted)]">
+        <div className="absolute right-2 -top-2.5 hidden group-hover:flex items-center gap-0.5 p-1 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] shadow-md text-xs text-[var(--color-ink-muted)] z-10">
           {/* AI Draft Reply Button */}
           {onDraftReply && (
             <DraftReplyButton
               messageId={message.id}
-              onDraftReady={onDraftReply}
+              onDraftClick={onDraftReply}
+              isDrafting={isDraftingThisMessage}
             />
           )}
 
@@ -169,9 +173,9 @@ export function MessageItem({
             <button
               onClick={() => onOpenThread(message)}
               title="Reply in thread"
-              className="p-1 hover:text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] rounded"
+              className="p-1.5 hover:text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] rounded-lg transition cursor-pointer"
             >
-              💬
+              <MessageSquare className="w-3.5 h-3.5" />
             </button>
           )}
           {isOwner && (
@@ -179,16 +183,16 @@ export function MessageItem({
               <button
                 onClick={() => setIsEditing(true)}
                 title="Edit message"
-                className="p-1 hover:text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] rounded"
+                className="p-1.5 hover:text-[var(--color-ink)] hover:bg-[var(--color-surface-2)] rounded-lg transition cursor-pointer"
               >
-                ✏️
+                <Pencil className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={handleDelete}
                 title="Delete message"
-                className="p-1 hover:text-[var(--color-danger)] hover:bg-[var(--color-surface-2)] rounded"
+                className="p-1.5 hover:text-[var(--color-danger)] hover:bg-[var(--color-surface-2)] rounded-lg transition cursor-pointer"
               >
-                🗑️
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </>
           )}

@@ -13,7 +13,8 @@ interface MessageListProps {
   onDelete: (messageId: string) => Promise<any>;
   onOpenThread?: (message: Message) => void;
   highlightMessageId?: string | null;
-  onDraftReply?: (draftText: string) => void;
+  onDraftReply?: (messageId: string) => void;
+  draftingMessageId?: string | null;
 }
 
 export function MessageList({
@@ -26,6 +27,7 @@ export function MessageList({
   onOpenThread,
   highlightMessageId,
   onDraftReply,
+  draftingMessageId,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const [activeHighlight, setActiveHighlight] = React.useState<string | null>(null);
@@ -112,6 +114,7 @@ export function MessageList({
             onDelete={onDelete}
             onOpenThread={onOpenThread}
             onDraftReply={onDraftReply}
+            isDraftingThisMessage={draftingMessageId === msg.id}
           />
         </React.Fragment>
       );
@@ -125,7 +128,7 @@ export function MessageList({
           <button
             onClick={onLoadMore}
             disabled={isFetchingMore}
-            className="px-4 py-1.5 rounded-full bg-[var(--color-surface-2)] text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition disabled:opacity-50"
+            className="px-4 py-1.5 rounded-full bg-[var(--color-surface-2)] text-xs text-[var(--color-ink-muted)] hover:text-[var(--color-ink)] transition disabled:opacity-50 cursor-pointer"
           >
             {isFetchingMore ? "Loading..." : "Load older messages"}
           </button>
