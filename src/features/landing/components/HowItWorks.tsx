@@ -1,5 +1,9 @@
+"use client";
+
 import * as React from "react";
 import { UserPlus, Link2, Sparkles } from "lucide-react";
+import { motion, type Variants } from "motion/react";
+import { useRevealMotion, VIEWPORT_CONFIG } from "../animation";
 
 const STEPS = [
   {
@@ -26,23 +30,50 @@ const STEPS = [
 ];
 
 export function HowItWorks() {
+  const { shouldReduceMotion, headingProps } = useRevealMotion();
+
+  const containerVariants: Variants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0 : 0.1,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.45, ease: "easeOut" },
+    },
+  };
+
   return (
     <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+      <motion.div {...headingProps} className="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-headline text-ink">
           How FistaChat works
         </h2>
         <p className="text-base sm:text-lg text-ink-muted">
           Three simple steps to bridge your communication stack and unlock grounded AI intelligence.
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={VIEWPORT_CONFIG}
+        className="grid grid-cols-1 md:grid-cols-3 gap-8"
+      >
         {STEPS.map((s) => {
           const Icon = s.icon;
           return (
-            <div
+            <motion.div
               key={s.step}
+              variants={itemVariants}
               className="p-6 rounded-[14px] bg-surface border border-border flex flex-col justify-between shadow-sm hover:border-primary/40 transition-all group"
             >
               <div className="space-y-4">
@@ -69,10 +100,10 @@ export function HowItWorks() {
                   <span>{s.bestFor.replace("Best for ", "")}</span>
                 </p>
               </div>
-            </div>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
     </section>
   );
 }

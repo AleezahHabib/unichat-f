@@ -1,21 +1,31 @@
+"use client";
+
 import * as React from "react";
 import { FistaChatLogo } from "@/components/ui/FistaChatLogo";
 import { FolderPlus } from "lucide-react";
+import { motion } from "motion/react";
+import { useRevealMotion } from "../animation";
 
 export function IntegrationsHub() {
+  const { headingProps, singleFadeProps } = useRevealMotion();
+
   return (
     <section id="integrations" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center space-y-12">
-      <div className="max-w-3xl mx-auto space-y-4">
+      {/* Section Heading & Intro line */}
+      <motion.div {...headingProps} className="max-w-3xl mx-auto space-y-4">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-headline text-ink">
           Connect your favorite platforms
         </h2>
         <p className="text-base sm:text-lg text-ink-muted">
           All your team conversations flow naturally into one unified stream. Bridge Slack and Discord channels with zero friction.
         </p>
-      </div>
+      </motion.div>
 
-      {/* SVG Diagram Container */}
-      <div className="max-w-4xl mx-auto p-8 rounded-[24px] bg-surface border border-border shadow-lg relative overflow-hidden">
+      {/* SVG / Diagram Container - Single Fade-in */}
+      <motion.div
+        {...singleFadeProps}
+        className="max-w-4xl mx-auto p-8 rounded-[24px] bg-surface border border-border shadow-lg relative overflow-hidden"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           {/* Spoke 1: Slack */}
           <div className="p-5 rounded-[16px] bg-surface-2 border border-border flex flex-col items-center space-y-3 shadow-sm hover:border-[#4A154B] transition-colors">
@@ -54,7 +64,7 @@ export function IntegrationsHub() {
             </span>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

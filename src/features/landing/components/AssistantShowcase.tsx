@@ -1,12 +1,18 @@
+"use client";
+
 import * as React from "react";
 import { Sparkles, Shield, ArrowUpRight, Hash } from "lucide-react";
+import { motion } from "motion/react";
+import { useRevealMotion } from "../animation";
 
 export function AssistantShowcase() {
+  const { headingProps, singleFadeProps } = useRevealMotion();
+
   return (
     <section id="assistant" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
       <div className="rounded-[24px] bg-ai/5 border border-ai/20 p-8 sm:p-12 shadow-xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        {/* Copy Left */}
-        <div className="space-y-6">
+        {/* Copy Left - Section Heading & Intro lines */}
+        <motion.div {...headingProps} className="space-y-6">
           <div className="flex items-center gap-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ai/10 border border-ai/30 text-xs font-semibold text-ai">
               <Sparkles className="w-4 h-4 text-ai" />
@@ -26,10 +32,13 @@ export function AssistantShowcase() {
             <Shield className="w-4 h-4 text-ai shrink-0" />
             <span>It only reads channels you&apos;ve joined. Private conversations stay private.</span>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Static Cited Conversation Right */}
-        <div className="p-6 rounded-[18px] bg-surface border border-ai/30 shadow-lg space-y-4">
+        {/* Static Cited Conversation Right - Assistant Showcase Single Fade-in */}
+        <motion.div
+          {...singleFadeProps}
+          className="p-6 rounded-[18px] bg-surface border border-ai/30 shadow-lg space-y-4"
+        >
           <div className="flex items-center justify-between pb-3 border-b border-border">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-ai" />
@@ -70,7 +79,7 @@ export function AssistantShowcase() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

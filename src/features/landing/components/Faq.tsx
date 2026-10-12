@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
+import { motion } from "motion/react";
+import { useRevealMotion } from "../animation";
 
 interface FaqItem {
   id: string;
@@ -38,7 +40,7 @@ const FAQS: FaqItem[] = [
     id: "faq-5",
     question: "Do I need a public server for Slack?",
     answer:
-      "No. FistaChat uses Slack Socket Mode, establishing an outbound WebSocket connection directly from the backend to Slack—no public ingress URL, static IP, or ngrok tunnel required.",
+      "No. FistaChat uses Slack Socket Mode, establishing an outbound WebSocket connection directly from the backend to Slack — no public ingress URL, static IP, or ngrok tunnel required.",
   },
   {
     id: "faq-6",
@@ -50,6 +52,7 @@ const FAQS: FaqItem[] = [
 
 export function Faq() {
   const [openId, setOpenId] = React.useState<string | null>("faq-1");
+  const { headingProps } = useRevealMotion();
 
   const toggle = (id: string) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -57,14 +60,14 @@ export function Faq() {
 
   return (
     <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-12">
-      <div className="text-center space-y-4">
+      <motion.div {...headingProps} className="text-center space-y-4">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-headline text-ink">
           Frequently asked questions
         </h2>
         <p className="text-base sm:text-lg text-ink-muted">
           Everything you need to know about FistaChat architecture, privacy, and integrations.
         </p>
-      </div>
+      </motion.div>
 
       <div className="space-y-4">
         {FAQS.map((faq) => {
@@ -102,4 +105,4 @@ export function Faq() {
       </div>
     </section>
   );
-}
+}

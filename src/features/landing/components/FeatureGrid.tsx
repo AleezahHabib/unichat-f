@@ -1,22 +1,55 @@
+"use client";
+
 import * as React from "react";
 import { Zap, MessageSquareText, ShieldCheck, Search, FileText, PenTool } from "lucide-react";
+import { motion, type Variants } from "motion/react";
+import { useRevealMotion, VIEWPORT_CONFIG } from "../animation";
 
 export function FeatureGrid() {
+  const { shouldReduceMotion, headingProps } = useRevealMotion();
+
+  const gridVariants: Variants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0 : 0.08,
+      },
+    },
+  };
+
+  const tileVariants: Variants = {
+    hidden: shouldReduceMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.45, ease: "easeOut" },
+    },
+  };
+
   return (
     <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-12">
-      <div className="text-center max-w-3xl mx-auto space-y-4">
+      <motion.div {...headingProps} className="text-center max-w-3xl mx-auto space-y-4">
         <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-headline text-ink">
           Engineered for real-time team collaboration
         </h2>
         <p className="text-base sm:text-lg text-ink-muted">
           A unified hub where instant team chat seamlessly integrates with your existing Discord and Slack communities.
         </p>
-      </div>
+      </motion.div>
 
       {/* Asymmetric Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <motion.div
+        variants={gridVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={VIEWPORT_CONFIG}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
         {/* Large Tile (Spans 2 columns on desktop) */}
-        <div className="md:col-span-2 p-8 rounded-[18px] bg-surface border border-border shadow-sm flex flex-col justify-between space-y-6">
+        <motion.div
+          variants={tileVariants}
+          className="md:col-span-2 p-8 rounded-[18px] bg-surface border border-border shadow-sm flex flex-col justify-between space-y-6"
+        >
           <div className="space-y-4">
             <div className="w-12 h-12 rounded-[12px] bg-live/10 border border-live/30 flex items-center justify-center text-live">
               <Zap className="w-6 h-6" />
@@ -25,7 +58,7 @@ export function FeatureGrid() {
               Sub-second live message delivery & presence
             </h3>
             <p className="text-sm sm:text-base text-ink-muted leading-relaxed max-w-xl">
-              Messages stream instantly across all clients with typing indicators and live online presence, so you always know who's around and what they're doing.
+              Messages stream instantly across all clients with typing indicators and live online presence, so you always know who&apos;s around and what they&apos;re doing.
             </p>
           </div>
 
@@ -38,10 +71,13 @@ export function FeatureGrid() {
               <div className="h-full bg-live w-[92%]" />
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Medium Tile 1: Deep Threads */}
-        <div className="p-6 rounded-[18px] bg-surface border border-border shadow-sm flex flex-col justify-between space-y-4">
+        <motion.div
+          variants={tileVariants}
+          className="p-6 rounded-[18px] bg-surface border border-border shadow-sm flex flex-col justify-between space-y-4"
+        >
           <div className="space-y-3">
             <div className="w-10 h-10 rounded-[10px] bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
               <MessageSquareText className="w-5 h-5" />
@@ -60,10 +96,13 @@ export function FeatureGrid() {
               14 replies
             </span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Medium Tile 2: Platform Badges & Multi-Relay */}
-        <div className="p-6 rounded-[18px] bg-surface border border-border shadow-sm flex flex-col justify-between space-y-4">
+        <motion.div
+          variants={tileVariants}
+          className="p-6 rounded-[18px] bg-surface border border-border shadow-sm flex flex-col justify-between space-y-4"
+        >
           <div className="space-y-3">
             <div className="w-10 h-10 rounded-[10px] bg-surface-2 border border-border flex items-center justify-center text-ink">
               <ShieldCheck className="w-5 h-5" />
@@ -87,10 +126,13 @@ export function FeatureGrid() {
               Sync: Active
             </span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Small Tile 1 (AI): Semantic Vector Search */}
-        <div className="p-6 rounded-[18px] bg-ai/5 border border-ai/20 shadow-sm flex flex-col justify-between space-y-4">
+        <motion.div
+          variants={tileVariants}
+          className="p-6 rounded-[18px] bg-ai/5 border border-ai/20 shadow-sm flex flex-col justify-between space-y-4"
+        >
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="w-10 h-10 rounded-[10px] bg-ai/10 border border-ai/30 flex items-center justify-center text-ai">
@@ -101,13 +143,16 @@ export function FeatureGrid() {
               Search by meaning
             </h3>
             <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-              Find what you&apos;re looking for by concept and context across UniChat, Slack, and Discord—even without exact keyword matches.
+              Find what you&apos;re looking for by concept and context across UniChat, Slack, and Discord — even without exact keyword matches.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Small Tile 2 (AI): Structured Summaries */}
-        <div className="p-6 rounded-[18px] bg-ai/5 border border-ai/20 shadow-sm flex flex-col justify-between space-y-4">
+        <motion.div
+          variants={tileVariants}
+          className="p-6 rounded-[18px] bg-ai/5 border border-ai/20 shadow-sm flex flex-col justify-between space-y-4"
+        >
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="w-10 h-10 rounded-[10px] bg-ai/10 border border-ai/30 flex items-center justify-center text-ai">
@@ -118,13 +163,16 @@ export function FeatureGrid() {
               Channel recaps
             </h3>
             <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">
-              Catch up in seconds with clear, structured summaries of key points, decisions, and open questions—always backed by source messages.
+              Catch up in seconds with clear, structured summaries of key points, decisions, and open questions — always backed by source messages.
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Small Tile 3 (AI): Contextual Draft Replies */}
-        <div className="p-6 rounded-[18px] bg-ai/5 border border-ai/20 shadow-sm flex flex-col justify-between space-y-4">
+        <motion.div
+          variants={tileVariants}
+          className="p-6 rounded-[18px] bg-ai/5 border border-ai/20 shadow-sm flex flex-col justify-between space-y-4"
+        >
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="w-10 h-10 rounded-[10px] bg-ai/10 border border-ai/30 flex items-center justify-center text-ai">
@@ -138,8 +186,9 @@ export function FeatureGrid() {
               Context-aware response suggestions generated right in your composer for you to review and edit before sending.
             </p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
+
