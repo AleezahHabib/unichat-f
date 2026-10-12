@@ -4,7 +4,10 @@ import { components } from "@/types/api";
 export type Message = components["schemas"]["MessageResponse"];
 export type MessagesPage = components["schemas"]["MessagesPageResponse"];
 export type Thread = components["schemas"]["ThreadResponse"];
-export type ClearChannelResponse = components["schemas"]["ClearChannelResponse"];
+export interface ClearChannelResponse {
+  channel_id: string;
+  cleared_at: string;
+}
 
 export async function getChannelMessages(
   channelId: string,
@@ -52,4 +55,8 @@ export async function clearChannelForMe(
 
 export async function getThread(messageId: string): Promise<Thread> {
   return apiClient<Thread>(`/messages/${messageId}/thread`);
+}
+
+export async function clearChannelMessages(channelId: string): Promise<ClearChannelResponse> {
+  return clearChannelForMe(channelId);
 }

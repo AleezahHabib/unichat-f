@@ -1,5 +1,7 @@
 "use client";
 
+import { Link2, Trash2 } from "lucide-react";
+
 import React, { useState, useEffect, use } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMessages } from "@/features/messaging/useMessages";
@@ -132,7 +134,7 @@ export default function ChannelPage({
                 onClick={() => setIsLinkModalOpen(true)}
                 className="px-3 py-1.5 rounded-xl bg-[var(--color-surface-2)] hover:bg-[var(--color-primary)] hover:text-white text-xs font-semibold text-[var(--color-ink)] transition flex items-center gap-1.5 cursor-pointer"
               >
-                <span>🔗</span> Link Platform
+                <Link2 className="w-3.5 h-3.5" /> Link Platform
               </button>
             )}
 
@@ -141,7 +143,7 @@ export default function ChannelPage({
               title="Delete all messages in this channel"
               className="px-3 py-1.5 rounded-xl bg-[var(--color-surface-2)] hover:bg-[var(--color-danger)]/15 hover:text-[var(--color-danger)] text-xs font-medium text-[var(--color-ink-muted)] transition flex items-center gap-1.5 border border-[var(--color-border)] hover:border-[var(--color-danger)]/30 cursor-pointer"
             >
-              <span>🗑️</span> Clear Chat
+              <Trash2 className="w-3.5 h-3.5" /> Clear Chat
             </button>
           </div>
         </header>
@@ -204,7 +206,7 @@ export default function ChannelPage({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="w-full max-w-md bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center gap-3 text-[var(--color-danger)]">
-              <span className="text-2xl">⚠️</span>
+              <Trash2 className="w-6 h-6" />
               <h3 className="font-bold text-lg text-[var(--color-ink)]">
                 Delete Complete Chat?
               </h3>

@@ -54,9 +54,7 @@ export function CitationChip({ citation, workspaceId, onJump }: CitationChipProp
       )}
 
       {/* Author Byline */}
-      <span className="text-[var(--color-ink-muted)] text-[11px] max-w-[100px] truncate">
-        • {citation.author_name}
-      </span>
+      <span className="text-[var(--color-ink-muted)] text-[11px] max-w-[100px] truncate">{citation.author_name}</span>
 
       {/* Jump icon indicator */}
       <ExternalLink className="w-2.5 h-2.5 text-[var(--color-ai)] opacity-0 group-hover:opacity-100 transition-opacity ml-0.5 shrink-0" />
