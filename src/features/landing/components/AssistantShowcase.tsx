@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, Shield, ArrowUpRight, Hash } from "lucide-react";
+import { Sparkles, Shield } from "lucide-react";
 import { motion } from "motion/react";
 import { useRevealMotion } from "../animation";
 
@@ -44,39 +44,17 @@ export function AssistantShowcase() {
               <Sparkles className="w-4 h-4 text-ai" />
               <span className="font-bold text-sm text-ink">UniChat Assistant</span>
             </div>
-            <span className="text-xs font-mono text-ai">Google Gemini 2.5 Flash</span>
           </div>
 
           <div className="space-y-3">
-            <div className="p-3 rounded-[10px] bg-surface-2 text-xs text-ink">
-              <span className="font-bold text-primary block mb-1">User Question</span>
-              What were the final test database requirements agreed upon?
+            <div className="p-3.5 rounded-[12px] bg-surface-2 text-xs sm:text-sm text-ink leading-relaxed">
+              <span className="font-bold text-primary block text-xs mb-1">User Question</span>
+              When is our team&apos;s product beta release scheduled, and what was decided about the onboarding rollout?
             </div>
 
-            <div className="p-4 rounded-[12px] bg-surface-2 border border-ai/20 text-xs text-ink space-y-3">
-              <p className="leading-relaxed">
-                The test database MUST use Neon PostgreSQL with a database name ending in <strong>_test</strong> to prevent safety check failures during pytest runs.
-              </p>
-
-              <div className="pt-2 border-t border-border">
-                <span className="text-[11px] font-semibold text-ink-muted block mb-1.5">
-                  Source Citations:
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-ai/10 text-ai font-mono text-[11px]">
-                    <Hash className="w-3 h-3" />
-                    #dev-backend : 88
-                    <ArrowUpRight className="w-3 h-3" />
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#4A154B]/10 text-ink font-mono text-[11px]">
-                    <span className="px-1 rounded bg-[#4A154B] text-white text-[9px] font-bold">
-                      Slack
-                    </span>
-                    #architecture
-                    <ArrowUpRight className="w-3 h-3" />
-                  </span>
-                </div>
-              </div>
+            <div className="p-4 rounded-[12px] bg-surface-2 border border-ai/20 text-xs sm:text-sm text-ink leading-relaxed">
+              <span className="font-bold text-ai block text-xs mb-1">Answer</span>
+              The team agreed to target <strong className="text-ink font-semibold">Thursday, November 14th</strong> for the customer beta release. Staging validation wraps up early next week, and onboarding updates will be shared directly across our connected team channels.
             </div>
           </div>
         </motion.div>

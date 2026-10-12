@@ -48,9 +48,9 @@ export function Footer() {
           </Link>
         </div>
 
-        {/* Technology stack attribution */}
-        <div className="text-xs text-ink-muted font-mono">
-          Built with Next.js, FastAPI, PostgreSQL, Redis and Gemini.
+        {/* Copyright notice */}
+        <div className="text-xs text-ink-muted">
+          &copy; 2026 FistaChat. All rights reserved.
         </div>
       </div>
     </footer>
