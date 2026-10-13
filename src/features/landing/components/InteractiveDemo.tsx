@@ -273,25 +273,15 @@ export function InteractiveDemo() {
       </div>
 
       {/* Demo Outer Container */}
-      <div className="max-w-[1040px] mx-auto px-10 max-[900px]:px-0" id="fc-demo">
+      <div className="fc-demo" id="fc-demo">
         {/* Laptop Lid */}
-        <div
-          className="rounded-[15px_15px_3px_3px] p-3 shadow-[0_1px_2px_rgba(0,0,0,0.3)] max-[900px]:p-0 max-[900px]:bg-none max-[900px]:shadow-none max-[900px]:rounded-none"
-          style={{ background: "linear-gradient(168deg, var(--bezel), var(--bezel-2))" }}
-        >
+        <div className="fc-lid">
           {/* Laptop Screen */}
-          <div
-            className="relative rounded-[6px] overflow-hidden p-[15px] aspect-[16/10] max-[900px]:bg-none max-[900px]:p-0 max-[900px]:rounded-none max-[900px]:overflow-visible max-[900px]:aspect-auto"
-            style={{ background: "var(--wall)" }}
-          >
+          <div className="fc-screen">
             {/* Stage */}
-            <div
-              ref={stageRef}
-              id="fc-stage"
-              className="relative grid grid-cols-[minmax(0,1fr)_236px] max-[900px]:grid-cols-[minmax(0,1fr)] gap-[13px] items-start h-full max-[900px]:h-auto"
-            >
+            <div ref={stageRef} id="fc-stage" className="fc-stage relative">
               {/* Browser Window */}
-              <div className="bg-surface border border-border rounded-[14px] shadow-xl overflow-hidden min-w-0 h-full max-[900px]:h-auto flex flex-col">
+              <div className="fc-browser">
                 {/* Browser Chrome Bar */}
                 <div className="flex items-center gap-2.5 px-3 py-2.5 bg-surface-2 border-b border-border">
                   <div className="flex gap-1.5 shrink-0">
@@ -305,9 +295,9 @@ export function InteractiveDemo() {
                 </div>
 
                 {/* App Interior */}
-                <div className="grid grid-cols-[158px_minmax(0,1fr)] max-[900px]:h-[376px] max-[760px]:grid-cols-[minmax(0,1fr)] max-[760px]:h-[366px] flex-1 min-h-0">
+                <div className="fc-app">
                   {/* Sidebar */}
-                  <aside className="bg-surface-2 border-r border-border p-3 flex flex-col gap-3.5 min-w-0 max-[760px]:hidden">
+                  <aside className="fc-side bg-surface-2 border-r border-border p-3 flex flex-col gap-3.5 min-w-0">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="w-6 h-6 rounded-[7px] bg-primary text-white grid place-items-center font-semibold text-xs shrink-0">
                         N
@@ -389,7 +379,7 @@ export function InteractiveDemo() {
 
                   {/* Channel View */}
                   {!isAssistantView ? (
-                    <main id="fc-chan" className="flex flex-col min-w-0 h-full">
+                    <main id="fc-chan" className="fc-chan">
                       {/* Channel Header */}
                       <div className="flex items-center gap-2.5 px-3.5 py-3 border-b border-border flex-wrap shrink-0">
                         <h3 className="text-[14.5px] font-semibold text-ink flex items-center gap-1 m-0">
@@ -429,7 +419,7 @@ export function InteractiveDemo() {
                       </div>
 
                       {/* Message Feed */}
-                      <div className="flex-1 min-h-0 overflow-hidden p-3.5 flex flex-col justify-end gap-3">
+                      <div className="fc-msgs">
                         {/* Bob Okafor Message */}
                         <div className="flex gap-2.5 min-w-0">
                           <span className="w-7 h-7 rounded-[8px] shrink-0 grid place-items-center text-white text-[11px] font-semibold bg-[#16A37F]">
@@ -640,7 +630,7 @@ export function InteractiveDemo() {
               </div>
 
               {/* Platform Panes Column */}
-              <div className="flex flex-col gap-3 min-w-0 max-[900px]:flex-row max-[560px]:flex-col">
+              <div className="fc-plats">
                 {/* Slack Pane */}
                 <div
                   id="fc-plat-slack"
@@ -815,12 +805,10 @@ export function InteractiveDemo() {
             )}
           </div>
 
-          {/* Laptop Base */}
-          <div
-            className="h-[14px] -mx-10 rounded-[0_0_13px_13px] relative shadow-[0_18px_34px_rgba(11,19,36,0.2)] max-[900px]:hidden before:content-[''] before:absolute before:inset-x-0 before:top-0 before:h-[1px] before:bg-white/[0.09] after:content-[''] after:absolute after:left-1/2 after:top-0 after:w-[94px] after:h-[6px] after:-translate-x-1/2 after:rounded-[0_0_8px_8px] after:bg-[var(--bezel-2)]"
-            style={{ background: "linear-gradient(180deg, var(--bezel), var(--bezel-2))" }}
-          />
         </div>
+
+        {/* Laptop Base */}
+        <div className="fc-base" id="fc-base" />
 
         {/* Step Progress Rail */}
         {isStarted && (
