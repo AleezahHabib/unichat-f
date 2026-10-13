@@ -1,0 +1,614 @@
+<!--
+  FistaChat — Interactive Demo (reference implementation)
+  ========================================================
+  This is ONLY the demo component. The navbar, headline, subline and hero CTAs
+  are deliberately not here — you already have those in Hero.tsx.
+
+  PORT BOUNDARY
+  Everything inside <div class="fc-demo"> ... </div> becomes
+  src/features/landing/components/InteractiveDemo.tsx
+
+  TOKENS
+  The :root block below duplicates the Skyline tokens so this file renders on
+  its own. DELETE IT when porting and read the real tokens from globals.css.
+  --bezel, --bezel-2 and --wall are the only new ones; add those three to
+  globals.css (both themes) and keep the rest as they already are.
+
+  STEP SIGNAL
+  The root element dispatches a `fc-demo-step` CustomEvent whenever the step
+  changes, with detail: { index, word, chip, running, finished }.
+  `word` is one of 'chat' | 'connect' | 'ask' — use it in Hero.tsx to move the
+  headline underline. In React this becomes an onStepChange prop instead.
+-->
+<title>Interactive Demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* ===== DELETE ON PORT: these already exist in globals.css ===== */
+:root{
+  --bg:#F6F9FF; --surface:#FFFFFF; --surface-2:#EEF3FC; --border:#DDE5F2;
+  --ink:#0B1324; --ink-muted:#5A6A85;
+  --primary:#2F6BFF; --primary-ink:#FFFFFF; --primary-soft:#E6EEFF;
+  --ai:#7C5CFF; --ai-soft:#EFEBFF; --live:#16C79A; --sky-top:#DCE9FF;
+  --slack:#4A154B; --discord:#5865F2;
+  --shadow:0 1px 2px rgba(11,19,36,.05), 0 10px 28px rgba(11,19,36,.09);
+  --shadow-lg:0 2px 6px rgba(11,19,36,.06), 0 28px 64px rgba(11,19,36,.16);
+  --ring:0 0 0 3px rgba(47,107,255,.35);
+  --display:'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --sans:'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* ===== KEEP THESE THREE: add to globals.css ===== */
+  --bezel:#232C40; --bezel-2:#121A2B;
+  --wall:linear-gradient(150deg,#D7E6FF,#F3F7FF 55%,#E9F0FF);
+  --scrim:rgba(246,249,255,.5);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#070B16; --surface:#0E1424; --surface-2:#151D31; --border:#22304A;
+    --ink:#E8EEFA; --ink-muted:#8C9AB5;
+    --primary:#5B8CFF; --primary-ink:#07122E; --primary-soft:#172448;
+    --ai:#9B84FF; --ai-soft:#1D1838; --live:#2EE0AE; --sky-top:#0B1733;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.4);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.5), 0 28px 64px rgba(0,0,0,.55);
+    --ring:0 0 0 3px rgba(91,140,255,.45);
+    --wall:linear-gradient(150deg,#15223F,#0A1026 55%,#101A33);
+    --scrim:rgba(7,11,22,.55);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#070B16; --surface:#0E1424; --surface-2:#151D31; --border:#22304A;
+  --ink:#E8EEFA; --ink-muted:#8C9AB5;
+  --primary:#5B8CFF; --primary-ink:#07122E; --primary-soft:#172448;
+  --ai:#9B84FF; --ai-soft:#1D1838; --live:#2EE0AE; --sky-top:#0B1733;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 28px rgba(0,0,0,.4);
+  --shadow-lg:0 2px 6px rgba(0,0,0,.5), 0 28px 64px rgba(0,0,0,.55);
+  --ring:0 0 0 3px rgba(91,140,255,.45);
+  --wall:linear-gradient(150deg,#15223F,#0A1026 55%,#101A33);
+  --scrim:rgba(7,11,22,.55);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding-inline:16px; padding-block:40px}
+/* ===== END DELETE ON PORT ===== */
+
+
+/* ===== PORT FROM HERE ===== */
+
+/* ---------- laptop frame ---------- */
+/* The lid's bottom corners are square so the wider base meets it flush, and the
+   demo carries side padding equal to the base's overhang so nothing overflows. */
+.fc-demo{max-width:1040px; margin-inline:auto; padding-inline:40px}
+.fc-lid{background:linear-gradient(168deg, var(--bezel), var(--bezel-2));
+  border-radius:15px 15px 3px 3px; padding:12px;
+  box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.fc-screen{position:relative; border-radius:6px; overflow:hidden;
+  background:var(--wall); padding:15px; aspect-ratio:16/10}
+.fc-base{height:14px; margin-inline:-40px; border-radius:0 0 13px 13px; position:relative;
+  background:linear-gradient(180deg, var(--bezel), var(--bezel-2));
+  box-shadow:0 18px 34px rgba(11,19,36,.2)}
+.fc-base::before{content:''; position:absolute; inset:0 0 auto 0; height:1px;
+  background:rgba(255,255,255,.09)}
+.fc-base::after{content:''; position:absolute; left:50%; top:0; width:94px; height:6px;
+  transform:translateX(-50%); border-radius:0 0 8px 8px; background:var(--bezel-2)}
+@media (max-width:900px){
+  .fc-demo{padding-inline:0}
+  .fc-lid{background:none; padding:0; box-shadow:none; border-radius:0}
+  .fc-screen{background:none; padding:0; border-radius:0; overflow:visible; aspect-ratio:auto}
+  .fc-base{display:none}
+}
+
+/* ---------- stage ---------- */
+.fc-stage{position:relative; display:grid; grid-template-columns:minmax(0,1fr) 236px;
+  gap:13px; align-items:start; height:100%}
+@media (max-width:900px){ .fc-stage{grid-template-columns:minmax(0,1fr); height:auto} }
+
+.fc-browser{background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  box-shadow:var(--shadow-lg); overflow:hidden; min-width:0; height:100%;
+  display:flex; flex-direction:column}
+@media (max-width:900px){ .fc-browser{height:auto; display:block} }
+.fc-chrome{display:flex; align-items:center; gap:10px; padding:9px 12px;
+  background:var(--surface-2); border-bottom:1px solid var(--border)}
+.fc-lights{display:flex; gap:6px; flex:none}
+.fc-lights i{width:10px; height:10px; border-radius:50%; background:var(--border); display:block}
+.fc-url{flex:1; min-width:0; font-family:var(--mono); font-size:11.5px; color:var(--ink-muted);
+  background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:4px 9px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.fc-app{display:grid; grid-template-columns:158px minmax(0,1fr); flex:1; min-height:0}
+@media (max-width:900px){ .fc-app{height:376px} }
+@media (max-width:760px){ .fc-app{grid-template-columns:minmax(0,1fr); height:366px} .fc-side{display:none} }
+
+/* ---------- sidebar ---------- */
+.fc-side{background:var(--surface-2); border-right:1px solid var(--border); padding:12px 10px;
+  min-width:0; display:flex; flex-direction:column; gap:14px}
+.fc-ws{display:flex; align-items:center; gap:8px; min-width:0}
+.fc-ws .mark{width:24px; height:24px; border-radius:7px; background:var(--primary);
+  color:var(--primary-ink); display:grid; place-items:center; font-weight:600; font-size:12px; flex:none}
+.fc-ws b{font-size:13px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.fc-navlabel{font-size:10.5px; font-weight:600; color:var(--ink-muted); letter-spacing:.06em; padding-left:7px}
+.fc-chlist{display:flex; flex-direction:column; gap:1px; margin-top:5px}
+.fc-chlist a{display:flex; align-items:center; gap:7px; padding:5px 8px; border-radius:7px;
+  font-size:13px; color:var(--ink-muted); text-decoration:none; min-width:0}
+.fc-chlist a .h{opacity:.65; font-weight:500}
+.fc-chlist a.on{background:var(--primary); color:var(--primary-ink); font-weight:500}
+.fc-chlist a.on .h{color:var(--primary-ink); opacity:.75}
+.fc-chlist a.ai.on{background:var(--ai)}
+.fc-chlist a span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* ---------- channel ---------- */
+.fc-chan{display:flex; flex-direction:column; min-width:0}
+.fc-chanhead{display:flex; align-items:center; gap:9px; padding:11px 14px;
+  border-bottom:1px solid var(--border); flex-wrap:wrap}
+.fc-chanhead h3{font-size:14.5px; font-weight:600; margin:0; display:flex; align-items:center; gap:4px}
+.fc-chanhead h3 .h{color:var(--ink-muted); font-weight:500}
+.fc-linkbtn{margin-left:auto; font:inherit; font-size:11.5px; font-weight:500; cursor:pointer;
+  background:var(--surface); color:var(--ink); border:1px solid var(--border);
+  padding:4px 10px; border-radius:7px}
+.fc-linkbtn:focus-visible{outline:none; box-shadow:var(--ring)}
+
+.fc-badge{display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:500;
+  padding:2.5px 7px; border-radius:999px; color:#fff; white-space:nowrap}
+.fc-badge.slack{background:var(--slack)}
+.fc-badge.discord{background:var(--discord)}
+.fc-badge .dot{width:5px; height:5px; border-radius:50%; background:currentColor; opacity:.85}
+
+.fc-msgs{flex:1; min-height:0; overflow:hidden; padding:12px 14px; display:flex;
+  flex-direction:column; justify-content:flex-end; gap:12px}
+.fc-msg{display:flex; gap:9px; min-width:0}
+.fc-msg .av{width:28px; height:28px; border-radius:8px; flex:none; display:grid;
+  place-items:center; color:#fff; font-size:11px; font-weight:600}
+.fc-msg .body{min-width:0; flex:1}
+.fc-msg .meta{display:flex; align-items:baseline; gap:7px; flex-wrap:wrap; margin-bottom:1px}
+.fc-msg .who{font-size:13px; font-weight:600}
+.fc-msg .at{font-size:11px; color:var(--ink-muted)}
+.fc-msg .txt{font-size:13.5px; margin:0}
+.fc-msg.in{animation:fc-rise .34s cubic-bezier(.2,.7,.3,1) both}
+.fc-msg.flash .txt{background:var(--primary-soft); border-radius:6px; margin:-3px -6px;
+  padding:3px 6px; animation:fc-flash 2.4s ease-out both}
+@keyframes fc-rise{from{opacity:0; transform:translateY(7px)} to{opacity:1; transform:none}}
+@keyframes fc-flash{0%,70%{background:var(--primary-soft)} 100%{background:transparent}}
+
+.fc-composer{margin:0 14px 14px; border:1px solid var(--border); border-radius:10px;
+  background:var(--surface); display:flex; align-items:center; gap:8px; padding:8px 8px 8px 12px}
+.fc-composer .draft{flex:1; min-width:0; font-size:13.5px; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap}
+.fc-composer .draft.empty{color:var(--ink-muted)}
+.fc-send{font:inherit; font-size:12px; font-weight:500; cursor:pointer; flex:none;
+  background:var(--primary); color:var(--primary-ink); border:0; padding:6px 13px; border-radius:7px}
+.fc-send:focus-visible{outline:none; box-shadow:var(--ring)}
+
+/* ---------- assistant pane ---------- */
+.fc-assist{display:none; flex-direction:column; min-width:0}
+.fc-assist.show{display:flex}
+.fc-assisthead{display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--border)}
+.fc-assisthead h3{font-size:14.5px; font-weight:600; margin:0}
+.fc-assisthead .tag{font-size:10.5px; font-weight:500; color:var(--ai);
+  background:var(--ai-soft); padding:2.5px 8px; border-radius:999px}
+.fc-thread{flex:1; padding:14px; display:flex; flex-direction:column; gap:12px; overflow:hidden}
+.fc-q{align-self:flex-end; max-width:82%; background:var(--surface-2); border:1px solid var(--border);
+  padding:8px 12px; border-radius:12px 12px 4px 12px; font-size:13.5px}
+.fc-a{max-width:94%}
+.fc-a .label{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ai);
+  font-weight:500; margin-bottom:5px}
+.fc-a .label .sq{width:14px; height:14px; border-radius:4px; background:var(--ai)}
+.fc-a p{margin:0 0 9px; font-size:13.5px}
+.fc-cites{display:flex; flex-wrap:wrap; gap:6px}
+.fc-cite{font:inherit; font-size:11px; cursor:pointer; display:inline-flex; align-items:center;
+  gap:5px; background:var(--surface); border:1px solid var(--border); color:var(--ink);
+  padding:3px 9px 3px 4px; border-radius:999px}
+.fc-cite:focus-visible{outline:none; box-shadow:var(--ring)}
+.fc-cite .src{width:14px; height:14px; border-radius:4px; display:grid; place-items:center;
+  color:#fff; font-size:8px; font-weight:700; flex:none}
+
+/* ---------- platform panes ---------- */
+.fc-plats{display:flex; flex-direction:column; gap:12px; min-width:0}
+@media (max-width:900px){ .fc-plats{flex-direction:row} .fc-plat{flex:1; min-width:0} }
+@media (max-width:560px){ .fc-plats{flex-direction:column} }
+.fc-plat{background:var(--surface); border:1px solid var(--border); border-radius:12px;
+  box-shadow:var(--shadow); overflow:hidden; opacity:.55; transition:opacity .45s ease}
+.fc-plat.lit{opacity:1}
+.fc-plat .ph{display:flex; align-items:center; gap:7px; padding:8px 11px;
+  border-bottom:1px solid var(--border); font-size:12px; font-weight:600}
+.fc-plat .ph .logo{width:17px; height:17px; border-radius:5px; display:grid; place-items:center;
+  color:#fff; font-size:9px; font-weight:700; flex:none}
+.fc-plat .ph .ch{color:var(--ink-muted); font-weight:500; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap}
+.fc-plat .pb{padding:10px 11px; display:flex; flex-direction:column; gap:9px;
+  height:106px; overflow:hidden}
+.fc-pmsg{display:flex; gap:7px; min-width:0}
+.fc-pmsg .av{width:22px; height:22px; border-radius:6px; flex:none; display:grid;
+  place-items:center; color:#fff; font-size:9px; font-weight:600}
+.fc-pmsg .meta{display:flex; align-items:baseline; gap:5px; flex-wrap:wrap}
+.fc-pmsg .who{font-size:11.5px; font-weight:600}
+.fc-pmsg .app{font-size:8.5px; font-weight:600; letter-spacing:.04em;
+  background:var(--surface-2); color:var(--ink-muted); padding:1px 4px; border-radius:3px}
+.fc-pmsg .txt{font-size:11.5px; color:var(--ink-muted); margin:2px 0 0}
+.fc-pmsg.in{animation:fc-rise .34s cubic-bezier(.2,.7,.3,1) both}
+.fc-pempty{font-size:11.5px; color:var(--ink-muted); opacity:.8; margin:auto 0; text-align:center}
+
+/* ---------- start gate ---------- */
+.fc-gate{position:absolute; inset:0; z-index:25; display:grid; place-items:center;
+  background:var(--scrim); backdrop-filter:blur(1.5px); transition:opacity .35s ease}
+.fc-gate[hidden]{display:none}
+.fc-go{font:inherit; font-size:14.5px; font-weight:600; cursor:pointer; color:var(--ink);
+  background:var(--surface); border:1px solid var(--border); border-radius:999px;
+  padding:13px 24px 13px 19px; box-shadow:var(--shadow-lg);
+  display:inline-flex; align-items:center; gap:10px}
+.fc-go .pulse{width:9px; height:9px; border-radius:50%; background:var(--primary);
+  position:relative; flex:none}
+.fc-go .pulse::after{content:''; position:absolute; inset:-5px; border-radius:50%;
+  border:2px solid var(--primary); animation:fc-ping 2s cubic-bezier(.2,.7,.3,1) infinite}
+.fc-go:focus-visible{outline:none; box-shadow:var(--shadow-lg), var(--ring)}
+
+/* ---------- hotspot + tooltip ---------- */
+.fc-spot{position:absolute; width:26px; height:26px; margin:-13px 0 0 -13px; padding:0; border:0;
+  border-radius:50%; cursor:pointer; background:var(--primary); z-index:30;
+  box-shadow:0 0 0 4px var(--surface), 0 4px 14px rgba(11,19,36,.25)}
+.fc-spot::after{content:''; position:absolute; inset:-6px; border-radius:50%;
+  border:2px solid var(--primary); animation:fc-ping 2s cubic-bezier(.2,.7,.3,1) infinite}
+.fc-spot::before{content:''; position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at 50% 38%, rgba(255,255,255,.95) 0 2px, transparent 3px)}
+.fc-spot:focus-visible{outline:none; box-shadow:0 0 0 4px var(--surface), var(--ring)}
+@keyframes fc-ping{0%{transform:scale(.7); opacity:.9} 70%{transform:scale(1.9); opacity:0} 100%{opacity:0}}
+
+.fc-tip{position:absolute; z-index:31; width:min(248px, 76vw); background:var(--surface);
+  border:1px solid var(--border); border-radius:11px; box-shadow:var(--shadow-lg); padding:11px 13px}
+.fc-tip .step{display:flex; align-items:center; gap:7px; margin-bottom:5px}
+.fc-tip .num{font-family:var(--mono); font-size:10px; color:var(--ink-muted)}
+.fc-tip .chip{font-size:10.5px; font-weight:600; color:var(--primary);
+  background:var(--primary-soft); padding:2px 8px; border-radius:999px}
+.fc-tip .chip.ai{color:var(--ai); background:var(--ai-soft)}
+.fc-tip p{margin:0; font-size:13px; line-height:1.5}
+.fc-tip .hint{margin-top:7px; font-size:11px; color:var(--ink-muted)}
+
+/* ---------- rail + finish ---------- */
+.fc-btn{font:inherit; font-size:12.5px; font-weight:500; cursor:pointer; border-radius:8px;
+  padding:7px 13px; background:var(--surface-2); color:var(--ink);
+  border:1px solid var(--border); text-decoration:none; display:inline-block}
+.fc-btn.key{background:var(--primary); color:var(--primary-ink); border-color:transparent}
+.fc-btn:focus-visible{outline:none; box-shadow:var(--ring)}
+.fc-btn[disabled]{opacity:.45; cursor:default}
+
+.fc-rail{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:16px;
+  padding:11px 14px; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; box-shadow:var(--shadow)}
+.fc-rail[hidden]{display:none}
+.fc-track{display:flex; align-items:center; gap:7px; flex:1; min-width:150px; flex-wrap:wrap}
+.fc-node{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--ink-muted)}
+.fc-node i{width:7px; height:7px; border-radius:50%; background:var(--border); display:block;
+  flex:none; transition:background .3s}
+.fc-node.done i{background:var(--live)}
+.fc-node.now i{background:var(--primary); box-shadow:0 0 0 3px var(--primary-soft)}
+.fc-node.now{color:var(--ink); font-weight:500}
+.fc-ctrls{display:flex; gap:8px; flex:none}
+
+.fc-done{margin-top:14px; padding:20px; border-radius:14px; border:1px solid var(--border);
+  background:linear-gradient(170deg, var(--sky-top), var(--surface) 70%); box-shadow:var(--shadow);
+  display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+.fc-done[hidden]{display:none}
+.fc-done h3{font-family:var(--display); font-weight:700; letter-spacing:-.02em;
+  font-size:21px; margin:0 0 4px}
+.fc-done p{margin:0; color:var(--ink-muted); font-size:13.5px; max-width:44ch}
+.fc-done .acts{display:flex; gap:9px; margin-left:auto; flex-wrap:wrap}
+
+@media (prefers-reduced-motion: reduce){
+  .fc-demo *, .fc-demo *::before, .fc-demo *::after{
+    animation-duration:.001ms !important; animation-iteration-count:1 !important;
+    transition-duration:.001ms !important}
+}
+</style>
+
+<div class="fc-demo" id="fc-demo">
+  <div class="fc-lid">
+    <div class="fc-screen">
+      <div class="fc-stage" id="fc-stage">
+
+        <div class="fc-browser">
+          <div class="fc-chrome">
+            <span class="fc-lights"><i></i><i></i><i></i></span>
+            <span class="fc-url">fistachat.app/workspace/northwind/launch</span>
+          </div>
+          <div class="fc-app">
+            <aside class="fc-side">
+              <div class="fc-ws"><span class="mark">N</span><b>Northwind Labs</b></div>
+              <div>
+                <div class="fc-navlabel">Channels</div>
+                <div class="fc-chlist">
+                  <a href="#" onclick="return false"><span class="h">#</span><span>general</span></a>
+                  <a href="#" onclick="return false"><span class="h">#</span><span>product</span></a>
+                  <a href="#" class="on" id="fc-nav-launch"><span class="h">#</span><span>launch</span></a>
+                </div>
+              </div>
+              <div>
+                <div class="fc-navlabel">Workspace</div>
+                <div class="fc-chlist">
+                  <a href="#" id="fc-nav-assist" class="ai" onclick="return false"><span class="h">&#9671;</span><span>Assistant</span></a>
+                  <a href="#" onclick="return false"><span class="h">&#9906;</span><span>Search</span></a>
+                  <a href="#" onclick="return false"><span class="h">&#9881;</span><span>Settings</span></a>
+                </div>
+              </div>
+            </aside>
+
+            <main class="fc-chan" id="fc-chan">
+              <div class="fc-chanhead">
+                <h3><span class="h">#</span>launch</h3>
+                <span class="fc-badge slack" id="fc-hdr-slack" hidden><span class="dot"></span>Slack</span>
+                <span class="fc-badge discord" id="fc-hdr-discord" hidden><span class="dot"></span>Discord</span>
+                <button class="fc-linkbtn" id="fc-btn-link" type="button">Link channel</button>
+              </div>
+              <div class="fc-msgs">
+                <div class="fc-msg">
+                  <span class="av" style="background:#16A37F">BO</span>
+                  <div class="body">
+                    <div class="meta"><span class="who">Bob Okafor</span><span class="at">9:14</span></div>
+                    <p class="txt">Checkout is failing on the refund path &mdash; the payments webhook times out.</p>
+                  </div>
+                </div>
+                <div class="fc-msg" id="fc-msg-priya">
+                  <span class="av" style="background:#4A154B">PR</span>
+                  <div class="body">
+                    <div class="meta"><span class="who">Priya Raman</span><span class="fc-badge slack"><span class="dot"></span>Slack</span><span class="at">9:15</span></div>
+                    <p class="txt">Refunds are blocked for everyone on the new checkout.</p>
+                  </div>
+                </div>
+                <div class="fc-msg">
+                  <span class="av" style="background:#2F6BFF">AC</span>
+                  <div class="body">
+                    <div class="meta"><span class="who">Alice Chen</span><span class="at">9:16</span></div>
+                    <p class="txt">How bad is it? Does this block the release?</p>
+                  </div>
+                </div>
+                <div class="fc-msg" id="fc-msg-sent" hidden>
+                  <span class="av" style="background:#2F6BFF">AC</span>
+                  <div class="body">
+                    <div class="meta"><span class="who">Alice Chen</span><span class="at">9:18</span></div>
+                    <p class="txt">Pushing the launch to October 14 so the refund fix ships first.</p>
+                  </div>
+                </div>
+                <div class="fc-msg" id="fc-msg-marco" hidden>
+                  <span class="av" style="background:#5865F2">MD</span>
+                  <div class="body">
+                    <div class="meta"><span class="who">Marco Diaz</span><span class="fc-badge discord"><span class="dot"></span>Discord</span><span class="at">9:21</span></div>
+                    <p class="txt">Confirmed on the community beta too &mdash; three reports this morning.</p>
+                  </div>
+                </div>
+              </div>
+              <div class="fc-composer">
+                <span class="draft" id="fc-draft">Pushing the launch to October 14 so the refund fix ships first.</span>
+                <button class="fc-send" id="fc-btn-send" type="button">Send</button>
+              </div>
+            </main>
+
+            <section class="fc-assist" id="fc-assist">
+              <div class="fc-assisthead">
+                <h3>Assistant</h3>
+                <span class="tag">Reads every linked platform</span>
+              </div>
+              <div class="fc-thread">
+                <div class="fc-q">What did we decide about the launch date?</div>
+                <div class="fc-a">
+                  <div class="label"><span class="sq"></span>Answer</div>
+                  <p>The launch moved to <b>October 14</b> so the refund fix ships first. The payments webhook was timing out on the refund path, which blocked refunds for everyone on the new checkout, and it was confirmed on the community beta as well.</p>
+                  <div class="fc-cites">
+                    <button class="fc-cite" type="button"><span class="src" style="background:#2F6BFF">F</span>Alice Chen</button>
+                    <button class="fc-cite" type="button" id="fc-cite-slack"><span class="src" style="background:#4A154B">S</span>Priya Raman</button>
+                    <button class="fc-cite" type="button"><span class="src" style="background:#5865F2">D</span>Marco Diaz</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="fc-plats">
+          <div class="fc-plat" id="fc-plat-slack">
+            <div class="ph"><span class="logo" style="background:#4A154B">S</span>Slack<span class="ch">&middot; #launch</span></div>
+            <div class="pb">
+              <div class="fc-pmsg">
+                <span class="av" style="background:#4A154B">PR</span>
+                <div class="body">
+                  <div class="meta"><span class="who">Priya Raman</span></div>
+                  <p class="txt">Refunds are blocked for everyone on the new checkout.</p>
+                </div>
+              </div>
+              <div class="fc-pmsg" id="fc-slack-echo" hidden>
+                <span class="av" style="background:#2F6BFF">AC</span>
+                <div class="body">
+                  <div class="meta"><span class="who">Alice Chen (via FistaChat)</span><span class="app">APP</span></div>
+                  <p class="txt">Pushing the launch to October 14 so the refund fix ships first.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fc-plat" id="fc-plat-discord">
+            <div class="ph"><span class="logo" style="background:#5865F2">D</span>Discord<span class="ch">&middot; #launch</span></div>
+            <div class="pb">
+              <div class="fc-pempty" id="fc-discord-empty">Quiet so far</div>
+              <div class="fc-pmsg" id="fc-discord-msg" hidden>
+                <span class="av" style="background:#5865F2">MD</span>
+                <div class="body">
+                  <div class="meta"><span class="who">Marco Diaz</span></div>
+                  <p class="txt">Confirmed on the community beta too &mdash; three reports this morning.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="fc-spot" id="fc-spot" type="button" aria-describedby="fc-tip" hidden></button>
+        <div class="fc-tip" id="fc-tip" role="status" hidden>
+          <div class="step"><span class="num" id="fc-tip-num">01</span><span class="chip" id="fc-tip-chip">Connect</span></div>
+          <p id="fc-tip-text"></p>
+          <div class="hint" id="fc-tip-hint"></div>
+        </div>
+      </div>
+
+      <div class="fc-gate" id="fc-gate">
+        <button class="fc-go" id="fc-go" type="button"><span class="pulse"></span>Start interactive demo</button>
+      </div>
+    </div>
+    <div class="fc-base"></div>
+  </div>
+
+  <div class="fc-rail" id="fc-rail" hidden>
+    <div class="fc-track" id="fc-track"></div>
+    <div class="fc-ctrls">
+      <button class="fc-btn" id="fc-back" type="button">Back</button>
+      <button class="fc-btn key" id="fc-next" type="button">Next</button>
+    </div>
+  </div>
+
+  <div class="fc-done" id="fc-done" hidden>
+    <div>
+      <h3>That was the whole product.</h3>
+      <p>One place for your team, linked to the tools they already use, with an assistant that shows its work.</p>
+    </div>
+    <div class="acts">
+      <a class="fc-btn key" href="/signup">Create a free workspace</a>
+      <button class="fc-btn" id="fc-replay" type="button">Replay demo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var root = $('#fc-demo'), stage = $('#fc-stage'), spot = $('#fc-spot');
+  var tip = $('#fc-tip'), gate = $('#fc-gate'), rail = $('#fc-rail');
+  var chan = $('#fc-chan'), assist = $('#fc-assist');
+
+  function reveal(sel, cls){ var el = $(sel); if(el){ el.hidden = false; if(cls) el.classList.add(cls); } }
+  function conceal(sel, cls){ var el = $(sel); if(el){ el.hidden = true; if(cls) el.classList.remove(cls); } }
+
+  function toAssistant(on){
+    chan.style.display = on ? 'none' : '';
+    assist.classList.toggle('show', on);
+    $('#fc-nav-assist').classList.toggle('on', on);
+    $('#fc-nav-launch').classList.toggle('on', !on);
+  }
+
+  // `word` drives the headline underline in Hero.tsx via the fc-demo-step event.
+  var steps = [
+    { chip:'Connect', word:'connect', target:'#fc-btn-link',
+      text:'Link this channel to Slack and Discord. One click — no tokens to paste.',
+      apply:function(){
+        $('#fc-hdr-slack').hidden = false; $('#fc-hdr-discord').hidden = false;
+        $('#fc-plat-slack').classList.add('lit'); $('#fc-plat-discord').classList.add('lit');
+        $('#fc-btn-link').textContent = 'Linked';
+      },
+      undo:function(){
+        $('#fc-hdr-slack').hidden = true; $('#fc-hdr-discord').hidden = true;
+        $('#fc-plat-slack').classList.remove('lit'); $('#fc-plat-discord').classList.remove('lit');
+        $('#fc-btn-link').textContent = 'Link channel';
+      } },
+    { chip:'Send', word:'chat', target:'#fc-btn-send',
+      text:'Send a message the way you always would.',
+      apply:function(){
+        reveal('#fc-msg-sent','in'); reveal('#fc-slack-echo','in');
+        $('#fc-draft').textContent = 'Message #launch'; $('#fc-draft').classList.add('empty');
+      },
+      undo:function(){
+        conceal('#fc-msg-sent','in'); conceal('#fc-slack-echo','in');
+        $('#fc-draft').textContent = 'Pushing the launch to October 14 so the refund fix ships first.';
+        $('#fc-draft').classList.remove('empty');
+      } },
+    { chip:'Receive', word:'connect', target:'#fc-plat-discord',
+      text:'It lands in Slack under your own name. Meanwhile a teammate replies from Discord.',
+      apply:function(){ $('#fc-discord-empty').hidden = true; reveal('#fc-discord-msg','in'); reveal('#fc-msg-marco','in'); },
+      undo:function(){ $('#fc-discord-empty').hidden = false; conceal('#fc-discord-msg','in'); conceal('#fc-msg-marco','in'); } },
+    { chip:'Ask', ai:true, word:'ask', target:'#fc-nav-assist',
+      text:'Ask about anything your team said — on any platform.',
+      apply:function(){ toAssistant(true); },
+      undo:function(){ toAssistant(false); } },
+    { chip:'Verify', ai:true, word:'ask', target:'#fc-cite-slack',
+      text:'Every answer links to the exact message behind it. This one came from Slack.',
+      apply:function(){ toAssistant(false); $('#fc-msg-priya').classList.add('flash'); },
+      undo:function(){ toAssistant(true); $('#fc-msg-priya').classList.remove('flash'); } }
+  ];
+
+  var at = 0, live = false;
+
+  var track = $('#fc-track');
+  steps.forEach(function(s){
+    var n = document.createElement('span');
+    n.className = 'fc-node';
+    n.innerHTML = '<i></i>' + s.chip;
+    track.appendChild(n);
+  });
+  var nodes = track.querySelectorAll('.fc-node');
+
+  function emit(){
+    var s = steps[at];
+    root.dispatchEvent(new CustomEvent('fc-demo-step', { bubbles:true, detail:{
+      index: at,
+      word: s ? s.word : null,
+      chip: s ? s.chip : null,
+      running: live,
+      finished: at >= steps.length
+    }}));
+  }
+
+  function place(){
+    var s = steps[at];
+    if(!live || !s){ spot.hidden = true; tip.hidden = true; return; }
+    var el = $(s.target);
+    if(!el){ spot.hidden = true; tip.hidden = true; return; }
+    spot.hidden = false; tip.hidden = false;
+    var sr = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
+    var cx = r.left + r.width/2 - sr.left, cy = r.top + r.height/2 - sr.top;
+    spot.style.left = cx + 'px'; spot.style.top = cy + 'px';
+    var tw = tip.offsetWidth, th = tip.offsetHeight, gap = 20;
+    var tx = cx + gap, ty = cy + gap;
+    if(tx + tw > sr.width - 4) tx = cx - gap - tw;
+    if(tx < 4) tx = Math.max(4, (sr.width - tw) / 2);
+    if(ty + th > sr.height - 4) ty = cy - gap - th;
+    if(ty < 4) ty = 4;
+    tip.style.left = tx + 'px'; tip.style.top = ty + 'px';
+  }
+
+  function render(){
+    var s = steps[at];
+    if(s){
+      $('#fc-tip-num').textContent = '0' + (at + 1);
+      var chip = $('#fc-tip-chip');
+      chip.textContent = s.chip;
+      chip.className = 'chip' + (s.ai ? ' ai' : '');
+      $('#fc-tip-text').textContent = s.text;
+      $('#fc-tip-hint').textContent = (at === steps.length - 1) ? 'Last step' : 'Click the blue dot to continue';
+    }
+    nodes.forEach(function(n, i){ n.className = 'fc-node' + (i < at ? ' done' : (i === at ? ' now' : '')); });
+    $('#fc-back').disabled = (at === 0);
+    $('#fc-next').disabled = (at >= steps.length);
+    $('#fc-done').hidden = (at < steps.length);
+    emit();
+    requestAnimationFrame(place);
+  }
+
+  function start(){ live = true; gate.hidden = true; rail.hidden = false; at = 0; render(); spot.focus(); }
+  function next(){ if(!live || at >= steps.length) return; steps[at].apply(); at++; render(); setTimeout(place, 420); }
+  function back(){ if(!live || at === 0) return; at--; steps[at].undo(); render(); setTimeout(place, 60); }
+  function replay(){ for(var i = steps.length - 1; i >= 0; i--){ if(i < at) steps[i].undo(); } at = 0; render(); }
+
+  $('#fc-go').addEventListener('click', start);
+  spot.addEventListener('click', next);
+  $('#fc-next').addEventListener('click', next);
+  $('#fc-back').addEventListener('click', back);
+  $('#fc-replay').addEventListener('click', replay);
+  $('#fc-btn-link').addEventListener('click', function(){ if(live && at === 0) next(); });
+  $('#fc-btn-send').addEventListener('click', function(){ if(live && at === 1) next(); });
+  $('#fc-cite-slack').addEventListener('click', function(){ if(live && at === 4) next(); });
+
+  document.addEventListener('keydown', function(e){
+    if(!live) return;
+    if(e.key === 'ArrowRight') next();
+    else if(e.key === 'ArrowLeft') back();
+  });
+
+  window.addEventListener('resize', place);
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(place); }
+
+  // Expose a start() hook so Hero's "See how it works" button can trigger it.
+  root.startDemo = start;
+})();
+</script>

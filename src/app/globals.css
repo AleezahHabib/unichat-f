@@ -31,6 +31,9 @@
   --color-live: #16C79A;
   --color-danger: #E5484D;
   --color-sky-top: #DCE9FF;
+  --bezel: #232C40;
+  --bezel-2: #121A2B;
+  --wall: linear-gradient(150deg, #D7E6FF, #F3F7FF 55%, #E9F0FF);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -46,6 +49,9 @@
     --color-live: #2EE0AE;
     --color-danger: #FF6B6F;
     --color-sky-top: #0B1733;
+    --bezel: #232C40;
+    --bezel-2: #121A2B;
+    --wall: linear-gradient(150deg, #15223F, #0A1026 55%, #101A33);
   }
 }
 
@@ -61,6 +67,9 @@
   --color-live: #2EE0AE;
   --color-danger: #FF6B6F;
   --color-sky-top: #0B1733;
+  --bezel: #232C40;
+  --bezel-2: #121A2B;
+  --wall: linear-gradient(150deg, #15223F, #0A1026 55%, #101A33);
 }
 
 [data-theme="light"] {
@@ -75,6 +84,9 @@
   --color-live: #16C79A;
   --color-danger: #E5484D;
   --color-sky-top: #DCE9FF;
+  --bezel: #232C40;
+  --bezel-2: #121A2B;
+  --wall: linear-gradient(150deg, #D7E6FF, #F3F7FF 55%, #E9F0FF);
 }
 
 * {
@@ -189,13 +201,47 @@ body {
   animation: sublineSwap 200ms ease-out 50ms forwards;
 }
 
+
+@keyframes fcPing {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fcFlash {
+  0%, 70% {
+    background-color: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.animate-hotspot-ping {
+  animation: fcPing 2s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+}
+
+.animate-msg-flash {
+  animation: fcFlash 2.4s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-cloud-1,
   .animate-cloud-2,
   .animate-cloud-3,
   .animate-cloud-4,
   .animate-pulse-glow,
-  .animate-sublineSwap {
+  .animate-sublineSwap,
+  .animate-hotspot-ping,
+  .animate-msg-flash {
     animation: none !important;
     transform: none !important;
     opacity: 1 !important;

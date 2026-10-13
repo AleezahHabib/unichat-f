@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/features/landing/components/Navbar";
 import { Hero } from "@/features/landing/components/Hero";
 import { PlatformStrip } from "@/features/landing/components/PlatformStrip";
+import { InteractiveDemo } from "@/features/landing/components/InteractiveDemo";
 import { HowItWorks } from "@/features/landing/components/HowItWorks";
 import { FeatureGrid } from "@/features/landing/components/FeatureGrid";
 import { AssistantShowcase } from "@/features/landing/components/AssistantShowcase";
@@ -44,6 +45,7 @@ export default function MarketingPage() {
       <main className="flex-1">
         <Hero />
         <PlatformStrip />
+        <InteractiveDemo />
         <HowItWorks />
         <FeatureGrid />
         <AssistantShowcase />
